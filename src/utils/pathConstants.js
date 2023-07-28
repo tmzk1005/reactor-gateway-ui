@@ -7,6 +7,7 @@ const RoutePaths = {
 }
 
 const ApiPaths = {
+    context: "/rgw/"
 }
 
 export { RoutePaths, ApiPaths }
