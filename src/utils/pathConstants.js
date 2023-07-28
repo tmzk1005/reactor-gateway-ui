@@ -4,6 +4,7 @@ const RoutePaths = {
     mgDashboard: "/mg/dashboard",
 
     mkIndex: "/mk",
+    mkLogin: "/mk/login"
 }
 
 const ApiPaths = {

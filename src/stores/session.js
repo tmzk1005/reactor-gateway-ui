@@ -1,4 +1,4 @@
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { defineStore } from 'pinia'
 
 const useSessionStore = defineStore('session', () => {
@@ -11,22 +11,24 @@ const useSessionStore = defineStore('session', () => {
   })
 
   function setUser(newUserInfo) {
-    userInfo.value.id = newUserInfo.id
-    userInfo.value.username = newUserInfo.username
-    userInfo.value.nickname = newUserInfo.nickname
-    userInfo.value.role = newUserInfo.role
-    userInfo.value.organizationId = newUserInfo.organizationId
+    userInfo.id = newUserInfo.id
+    userInfo.username = newUserInfo.username
+    userInfo.nickname = newUserInfo.nickname
+    userInfo.role = newUserInfo.role
+    userInfo.organizationId = newUserInfo.organizationId
   }
 
   function clear() {
-    userInfo.value.id = null
-    userInfo.value.username = null
-    userInfo.value.nickname = "未登录"
-    userInfo.value.role = null
-    userInfo.value.organizationId = null
+    userInfo.id = null
+    userInfo.username = null
+    userInfo.nickname = "未登录"
+    userInfo.role = null
+    userInfo.organizationId = null
   }
 
-  return { userInfo, setUser, clear }
+  const isAuthenticated = computed(() => userInfo.id != null && userInfo.id != undefined)
+
+  return { userInfo, setUser, clear, isAuthenticated }
 })
 
 export { useSessionStore }

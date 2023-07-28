@@ -1,5 +1,5 @@
 <template>
   <div>
-    Api Management Login Page
+    Api Market Login Page
   </div>
 </template>
