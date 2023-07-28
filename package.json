@@ -25,5 +25,33 @@
     "prettier": "^3.0.0",
     "unplugin-vue-components": "^0.25.1",
     "vite": "^4.4.6"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true,
+      "vue/setup-compiler-macros": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended",
+      "@vue/eslint-config-prettier/skip-formatting"
+    ],
+    "parserOptions": {
+      "ecmaVersion": "latest"
+    },
+    "rules": {
+      "semi": [
+        "warn",
+        "never"
+      ],
+      "max-len": [
+        "warn",
+        160
+      ],
+      "no-tabs": [
+        "warn"
+      ]
+    }
   }
 }
