@@ -1,7 +1,7 @@
 <template>
   <a-layout style="min-height: 100vh">
     <a-layout-header style="padding: 0; position: fixed; zIndex: 99; width: 100%; height: 40px; line-height: 40px;">
-      Header
+      <mg-top-bar></mg-top-bar>
     </a-layout-header>
     <a-layout style="margin: 40px 0 0 0; padding: 0">
       <a-layout-sider v-model:collapsed="collapsed" collapsible
@@ -16,6 +16,7 @@
 </template>
 
 <script setup>
+import MgTopBar from "@/components/topBar/MgTopBar.vue"
 import { ref, computed } from 'vue'
 
 const collapsed = ref(false)
