@@ -5,6 +5,13 @@ import { RoutePaths } from '../utils/pathConstants'
 const apiManagementRoutes = {
   path: RoutePaths.mgIndex,
   component: () => import("@/views/mg/Index.vue"),
+  redirect: RoutePaths.mgDashboard,
+  children: [
+    {
+      path: RoutePaths.mgDashboard,
+      component: () => import("@/views/mg/Dashboard.vue")
+    },
+  ]
 }
 
 const apiMarketRoutes = {
