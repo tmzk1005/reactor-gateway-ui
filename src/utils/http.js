@@ -75,4 +75,6 @@ const HttpClient = axios.create({
 HttpClient.interceptors.request.use(configRequest, (error) => Promise.reject(error))
 HttpClient.interceptors.response.use((resp) => handleOk(resp), (error) => handleError(error))
 
-export { HttpClient }
+const NoAuto = { autoHandle: false }
+
+export { HttpClient, NoAuto }

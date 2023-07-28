@@ -8,7 +8,8 @@ const RoutePaths = {
 }
 
 const ApiPaths = {
-    context: "/rgw/"
+    context: "/rgw/api/",
+    login: "/user/_login"
 }
 
 export { RoutePaths, ApiPaths }
