@@ -4,19 +4,19 @@ import { RoutePaths } from '../utils/pathConstants'
 
 const apiManagementRoutes = {
   path: RoutePaths.mgIndex,
-  component: () => import("@/views/mg/Index.vue"),
+  component: () => import("@/views/mg/MgIndex.vue"),
   redirect: RoutePaths.mgDashboard,
   children: [
     {
       path: RoutePaths.mgDashboard,
-      component: () => import("@/views/mg/Dashboard.vue")
+      component: () => import("@/views/mg/MgDashboard.vue")
     },
   ]
 }
 
 const apiMarketRoutes = {
   path: RoutePaths.mkIndex,
-  component: () => import("@/views/mk/Index.vue"),
+  component: () => import("@/views/mk/MkIndex.vue"),
 }
 
 const router = createRouter({
@@ -24,7 +24,7 @@ const router = createRouter({
   routes: [
     {
       path: RoutePaths.mgLogin,
-      component: () => import("@/views/mg/Login.vue")
+      component: () => import("@/views/mg/MgLogin.vue")
     },
     {
       path: '/',
