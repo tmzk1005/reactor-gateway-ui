@@ -1,5 +1,6 @@
 import { computed, reactive } from 'vue'
 import { defineStore } from 'pinia'
+import { Role } from '@/utils/bizConstants'
 
 const useSessionStore = defineStore('session', () => {
 
@@ -56,7 +57,11 @@ const useSessionStore = defineStore('session', () => {
 
   const isAuthenticated = computed(() => userInfo.id != null && userInfo.id != undefined)
 
-  return { userInfo, setUser, clear, isAuthenticated }
+  const isSystemAdmin = computed(() => isAuthenticated.value && userInfo.role == Role.systemAdmin)
+
+  const isNormalUser = computed(() => isAuthenticated.value && userInfo.role == Role.normalUser)
+
+  return { userInfo, setUser, clear, isAuthenticated, isSystemAdmin, isNormalUser }
 })
 
 export { useSessionStore }

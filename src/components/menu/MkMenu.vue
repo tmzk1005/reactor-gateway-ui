@@ -2,7 +2,7 @@
   <a-menu theme="light" mode="inline">
     <a-menu-item key="apiMarket">
       <area-chart-outlined />
-      <span>API市场</span>
+      <span><code>API</code>市场</span>
     </a-menu-item>
 
     <a-menu-item key="app">

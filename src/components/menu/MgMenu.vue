@@ -34,12 +34,32 @@
       <user-outlined />
       <span>我的信息</span>
     </a-menu-item>
+
+    <a-menu-item key="user" v-if="sessionStore.isSystemAdmin">
+      <team-outlined />
+      <span>用户管理</span>
+    </a-menu-item>
+
+    <a-menu-item key="organization" v-if="sessionStore.isSystemAdmin">
+      <group-outlined />
+      <span>组织管理</span>
+    </a-menu-item>
+
+    <a-menu-item key="gatewayNode" v-if="sessionStore.isSystemAdmin">
+      <cluster-outlined />
+      <span>网关节点</span>
+    </a-menu-item>
+
   </a-menu>
 </template>
 
 <script setup>
 import {
-  ApiOutlined, AreaChartOutlined, DeliveredProcedureOutlined,
-  SnippetsOutlined, UserOutlined, UsbOutlined, EnvironmentOutlined
+  ApiOutlined, AreaChartOutlined, DeliveredProcedureOutlined, TeamOutlined, GroupOutlined,
+  SnippetsOutlined, UserOutlined, UsbOutlined, EnvironmentOutlined, ClusterOutlined
 } from '@ant-design/icons-vue'
+
+import { useSessionStore } from "@/stores/session"
+
+const sessionStore = useSessionStore()
 </script>
