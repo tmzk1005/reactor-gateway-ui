@@ -61,7 +61,9 @@ const useSessionStore = defineStore('session', () => {
 
   const isNormalUser = computed(() => isAuthenticated.value && userInfo.role == Role.normalUser)
 
-  return { userInfo, setUser, clear, isAuthenticated, isSystemAdmin, isNormalUser }
+  const token = computed(() => userInfo.jwtToken)
+
+  return { userInfo, token, setUser, clear, isAuthenticated, isSystemAdmin, isNormalUser }
 })
 
 export { useSessionStore }

@@ -13,6 +13,10 @@ const apiManagementRoutes = {
       path: RoutePaths.mgDashboard,
       component: () => import("@/views/mg/MgDashboard.vue")
     },
+    {
+      path: RoutePaths.mgOrganization,
+      component: () => import("@/views/mg/MgOrganization.vue")
+    },
   ]
 }
 

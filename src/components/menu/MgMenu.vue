@@ -1,6 +1,6 @@
 <template>
   <a-menu theme="dark" mode="inline">
-    <a-menu-item key="dashboard">
+    <a-menu-item key="dashboard" @click="goToPage(RoutePaths.mgDashboard)">
       <area-chart-outlined />
       <span>仪表板</span>
     </a-menu-item>
@@ -40,7 +40,7 @@
       <span>用户管理</span>
     </a-menu-item>
 
-    <a-menu-item key="organization" v-if="sessionStore.isSystemAdmin">
+    <a-menu-item key="organization" v-if="sessionStore.isSystemAdmin" @click="goToPage(RoutePaths.mgOrganization)">
       <group-outlined />
       <span>组织管理</span>
     </a-menu-item>
@@ -60,6 +60,13 @@ import {
 } from '@ant-design/icons-vue'
 
 import { useSessionStore } from "@/stores/session"
+import { useRouter } from "vue-router"
+import { RoutePaths} from "@/utils/pathConstants"
 
 const sessionStore = useSessionStore()
+const router = useRouter()
+
+const goToPage = (dstPath) => {
+  router.push(dstPath)
+}
 </script>
