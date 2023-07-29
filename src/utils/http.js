@@ -11,6 +11,10 @@ const configRequest = (config) => {
   if (config.data instanceof FormData) {
     Object.assign(config.headers, config.data.getHeaders())
   }
+  const jwtToken = sessionStore.token
+  if (jwtToken) {
+    config.headers['Authorization'] = jwtToken
+  }
   return config
 }
 
@@ -32,7 +36,7 @@ const handleOk = (resp) => {
       message: message,
       duration: 2,
     })
-    return Promise.reject(message)
+    // return Promise.reject(message)
   }
 }
 
@@ -60,7 +64,7 @@ const handleError = (error) => {
       description: notificationDescription
     })
   }
-  return Promise.reject(error)
+  // return Promise.reject(error)
 }
 
 const HttpClient = axios.create({
