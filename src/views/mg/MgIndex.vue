@@ -6,7 +6,7 @@
     <a-layout style="margin: 40px 0 0 0; padding: 0">
       <a-layout-sider v-model:collapsed="collapsed" collapsible
         style="position: fixed; height: 100vh; overflow: auto; padding: 0; margin: 0">
-        Sider
+        <mg-menu></mg-menu>
       </a-layout-sider>
       <a-layout-content :style="{ marginLeft: mainContentMarginLeft }">
         <router-view />
@@ -17,6 +17,8 @@
 
 <script setup>
 import MgTopBar from "@/components/topBar/MgTopBar.vue"
+import MgMenu from "@/components/menu/MgMenu.vue"
+
 import { ref, computed } from 'vue'
 
 const collapsed = ref(false)
