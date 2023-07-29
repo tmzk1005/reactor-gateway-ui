@@ -13,7 +13,7 @@
       </template>
       <template #title>{{ nickname }}</template>
 
-      <a-menu-item>
+      <a-menu-item @click="router.push(RoutePaths.mgIndex)">
         <template #icon>
           <gateway-outlined />
         </template>

@@ -12,7 +12,7 @@
         <user-outlined />
       </template>
       <template #title>{{nickname}}</template>
-      <a-menu-item>
+      <a-menu-item @click="router.push(RoutePaths.mkIndex)">
         <template #icon>
           <cloud-server-outlined />
         </template>
