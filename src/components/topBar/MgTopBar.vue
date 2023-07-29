@@ -11,7 +11,7 @@
       <template #icon>
         <user-outlined />
       </template>
-      <template #title>NickName</template>
+      <template #title>{{nickname}}</template>
       <a-menu-item>
         <template #icon>
           <cloud-server-outlined />
@@ -36,7 +36,7 @@
         </template>
         设置
       </a-menu-item>
-      <a-menu-item>
+      <a-menu-item @click="onLogout">
         <template #icon>
           <logout-outlined />
         </template>
@@ -47,12 +47,32 @@
 </template>
 
 <script setup>
-import { reactive } from "vue"
+import { reactive, ref } from "vue"
+import { UserService } from "@/services/userService"
+import { useRouter } from "vue-router"
+import { RoutePaths } from "@/utils/pathConstants"
+import { useSessionStore } from "@/stores/session"
 
 import {
   GatewayOutlined, UserOutlined, CloudServerOutlined,
   InfoCircleOutlined, SettingOutlined, LogoutOutlined, EditOutlined
 } from "@ant-design/icons-vue"
 
+const nickname = ref("未登录")
+
 const noUse = reactive([""])
+const router = useRouter()
+
+const onLogout = function () {
+  UserService.logout().then(() => {
+    router.push(RoutePaths.mgLogin)
+  })
+}
+
+const setNickName = () => {
+  nickname.value = useSessionStore().userInfo.nickname
+}
+
+setNickName()
+
 </script>
