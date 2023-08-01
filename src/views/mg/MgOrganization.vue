@@ -23,7 +23,7 @@
     <a-row type="flex" justify="center">
       <a-col :span="24">
         <a-modal width="50%" v-model:open="modalVisible" title="新建组织">
-          <a-form ref="newOrganizationFormRef" :model="newOrganization" :label-col="{ span: 4 }"
+          <a-form ref="newOrganizationFormRef" :model="newOrganization" :rules="newOrganizationRules" :label-col="{ span: 4 }"
             :wrapper-col="{ span: 24 }">
             <a-form-item label="组织名称" name="name">
               <a-input v-model:value="newOrganization.name" placeholder="请输入组织名称" />
@@ -44,6 +44,7 @@ import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
 import { reactive, ref } from "vue"
 import { notification } from "ant-design-vue"
 import { OrganizationService } from "@/services/organizationService"
+import { PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
 
 const modalVisible = ref(false)
 const organizationList = ref([])
@@ -54,6 +55,19 @@ const organizationFields = [
   { title: "组织名称", dataIndex: "name" },
   { title: "创建时间", dataIndex: "createdDate" }
 ]
+
+const newOrganizationRules = {
+  name: [
+    { required: true, message: "请输入组织名称", trigger: "blur" },
+    { min: 3, message: "组织名称至少需要包含3个字符", trigger: "blur" },
+    { max: 32, message: "组织名称长度不能超过32个字符", trigger: "blur" },
+    {
+      pattern: PATTERN_NORMAL_NAME_ZH,
+      message: "用户名只能包含字母,数字,下划线,以及中文",
+      trigger: "blur",
+    },
+  ]
+}
 
 const newOrganization = reactive({
   name: null,
