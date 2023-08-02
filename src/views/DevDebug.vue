@@ -13,12 +13,12 @@
         </a-form-item>
 
         <a-form-item label="请求路径" name="path">
-          <a-input v-model:value="httpReq.path" />
+          <a-input v-model:value="httpReq.path" style="font-size: 1.2rem; font-family: monospace;"/>
         </a-form-item>
 
         <a-form-item label="url参数" name="urlParams">
           <a-textarea v-model:value="httpReq.urlParams" :autosize="{ minRows: 2, maxRows: 5 }"
-            placeHolder="按json格式配置键值对" />
+            placeHolder="按json格式配置键值对" style="font-size: 1.2rem; font-family: monospace;"/>
         </a-form-item>
 
         <a-form-item label="Content-Type" name="contentType">
@@ -29,7 +29,7 @@
         </a-form-item>
 
         <a-form-item label="请求体" name="reqBody">
-          <a-textarea v-model:value="httpReq.reqBody" :autosize="{ minRows: 5, maxRows: 20 }" />
+          <a-textarea v-model:value="httpReq.reqBody" :autosize="{ minRows: 5, maxRows: 20 }" style="font-size: 1.2rem; font-family: monospace;"/>
         </a-form-item>
 
         <a-form-item :wrapper-col="{ offset: 4, span: 12 }">
@@ -39,10 +39,12 @@
         <a-divider />
 
         <a-form-item label="响应" name="resp" style="padding-top: 30px;" v-if="httpReq.respBody != ''">
-          <a-textarea v-model:value="httpReq.respBody" readonly :autosize="{ minRows: 5, maxRows: 30 }" />
+          <div>
+            <highlightjs language="json" readonly :code="httpReq.respBody" />
+          </div>
         </a-form-item>
-
       </a-form>
+
     </a-layout-content>
   </a-layout>
 </template>
@@ -77,7 +79,7 @@ const sendRequest = () => {
     req.params = JSON.parse(httpReq.urlParams)
   }
   HttpClient(req)
-    .then((data) => httpReq.respBody = JSON.stringify(data))
+    .then((data) => httpReq.respBody = JSON.stringify(data, null, 4))
 }
 </script>
 
