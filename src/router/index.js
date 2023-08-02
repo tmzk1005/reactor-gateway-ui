@@ -50,6 +50,11 @@ const router = createRouter({
         apiMarketRoutes
       ]
     },
+    {
+      path: '/devDebug',
+      name: 'devDebug',
+      component: () => import("@/views/DevDebug.vue")
+    },
   ]
 })
 
@@ -75,6 +80,11 @@ const goToMkPage = function (dstPath) {
 
 router.beforeEach(async (to) => {
   const dstPath = to.path
+
+  if (dstPath == "/devDebug") {
+    return true
+  }
+
   if (dstPath.startsWith(RoutePaths.mgIndex) || dstPath == RoutePaths.mgLogin) {
     return goToMgPage(dstPath)
   } else if (dstPath.startsWith(RoutePaths.mkIndex) || dstPath == RoutePaths.mkLogin) {
