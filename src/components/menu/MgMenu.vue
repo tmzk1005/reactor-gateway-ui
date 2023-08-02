@@ -20,7 +20,7 @@
       <span><code>API</code>访问申请</span>
     </a-menu-item>
 
-    <a-menu-item key="environment">
+    <a-menu-item key="environment" @click="goToPage(RoutePaths.mgEnvironment)">
       <environment-outlined />
       <span>环境</span>
     </a-menu-item>

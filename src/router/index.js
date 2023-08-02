@@ -17,6 +17,10 @@ const apiManagementRoutes = {
       path: RoutePaths.mgOrganization,
       component: () => import("@/views/mg/MgOrganization.vue")
     },
+    {
+      path: RoutePaths.mgEnvironment,
+      component: () => import("@/views/mg/MgEnvironment.vue")
+    },
   ]
 }
 
