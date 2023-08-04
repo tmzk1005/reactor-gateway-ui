@@ -4,6 +4,7 @@ const RoutePaths = {
     mgDashboard: "/mg/dashboard",
     mgOrganization: "/mg/organization",
     mgEnvironment: "/mg/environment",
+    mgUser: "/mg/user",
 
     mkIndex: "/mk",
     mkLogin: "/mk/login"
@@ -14,6 +15,7 @@ const ApiPaths = {
     login: "/user/_login",
     organization: "/organization",
     environment: "/environment",
+    user: "/user",
 }
 
 export { RoutePaths, ApiPaths }

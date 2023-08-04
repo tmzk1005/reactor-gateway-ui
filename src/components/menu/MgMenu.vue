@@ -35,7 +35,7 @@
       <span>我的信息</span>
     </a-menu-item>
 
-    <a-menu-item key="user" v-if="sessionStore.isSystemAdmin">
+    <a-menu-item key="user" v-if="sessionStore.isSystemAdmin" @click="goToPage(RoutePaths.mgUser)">
       <team-outlined />
       <span>用户管理</span>
     </a-menu-item>

@@ -10,8 +10,17 @@ const logout = async () => {
   useSessionStore().clear()
 }
 
+const createUser = async (userDto) => {
+  return await HttpClient.post(ApiPaths.user, userDto)
+}
+
+const listUsers = async (pageNum, pageSize) => {
+  const params = { pageNum: pageNum, pageSize: pageSize }
+  return await HttpClient.get(ApiPaths.user, { params: params })
+}
+
 const UserService = {
-  login, logout
+  login, logout, createUser, listUsers
 }
 
 export { UserService }
