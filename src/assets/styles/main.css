@@ -4,7 +4,7 @@ body {
   margin: 0;
 }
 
-#app > section.ant-layout {
+#app>section.ant-layout {
   padding: 0;
   margin: 0;
 }
@@ -30,4 +30,12 @@ body {
 .ant-divider,
 .ant-divider-horizontal {
   margin: 12px 0 0 0;
+}
+
+.ant-table,
+.ant-table-cell,
+.ant-menu,
+div,
+span {
+  font-family: monospace;
 }
