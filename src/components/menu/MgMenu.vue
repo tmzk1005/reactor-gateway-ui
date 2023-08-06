@@ -5,7 +5,7 @@
       <span>仪表板</span>
     </a-menu-item>
 
-    <a-menu-item key="api">
+    <a-menu-item key="api" @click="goToPage(RoutePaths.mgApi)">
       <api-outlined />
       <span><code>API</code></span>
     </a-menu-item>

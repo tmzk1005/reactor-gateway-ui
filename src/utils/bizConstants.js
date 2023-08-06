@@ -25,4 +25,19 @@ const DefaultPaginationConf = {
   showTotal: (total) => "共" + total + "条",
 }
 
-export { Role, RoleSelectOptions, DefaultPaginationConf }
+const colorForHttpMethod = (method) => {
+  let   m = method.toUpperCase()
+  if ("GET" == m) {
+    return 'green'
+  } else if ("POST" == m) {
+    return 'blue'
+  } else if ("PATCH" == m) {
+    return 'orange'
+  } else if ("DELETE" == m) {
+    return 'red'
+  } else {
+    return "purple"
+  }
+}
+
+export { Role, RoleSelectOptions, DefaultPaginationConf, colorForHttpMethod }
