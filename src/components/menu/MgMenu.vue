@@ -15,7 +15,7 @@
       <span>访问日志</span>
     </a-menu-item>
 
-    <a-menu-item key="apiApplyApprove">
+    <a-menu-item key="apiApplyApprove" @click="goToPage(RoutePaths.mgApiApply)">
       <delivered-procedure-outlined />
       <span><code>API</code>访问申请</span>
     </a-menu-item>
