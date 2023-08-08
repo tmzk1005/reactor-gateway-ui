@@ -10,9 +10,9 @@
       <span><code>API</code></span>
     </a-menu-item>
 
-    <a-menu-item key="accessLog">
+    <a-menu-item key="accessLog" @click="goToPage(RoutePaths.mgAccessLog)">
       <snippets-outlined />
-      <span>网关访问日志</span>
+      <span>访问日志</span>
     </a-menu-item>
 
     <a-menu-item key="apiApplyApprove">

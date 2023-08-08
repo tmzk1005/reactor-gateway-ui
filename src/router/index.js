@@ -29,6 +29,10 @@ const apiManagementRoutes = {
       path: RoutePaths.mgApi,
       component: () => import("@/views/mg/MgApi.vue")
     },
+    {
+      path: RoutePaths.mgAccessLog,
+      component: () => import("@/views/mg/AccessLog.vue")
+    },
   ]
 }
 
