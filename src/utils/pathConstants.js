@@ -19,6 +19,9 @@ const ApiPaths = {
     organization: "/organization",
     environment: "/environment",
     user: "/user",
+    userEnable: (userId) => `/user/_enable/${userId}`,
+    userDisable: (userId) => `/user/_disable/${userId}`,
+    userDelete: (userId) => `/user/_delete/${userId}`,
     api: "/api",
 }
 

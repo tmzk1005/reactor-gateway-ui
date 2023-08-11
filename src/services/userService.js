@@ -19,8 +19,20 @@ const listUsers = async (pageNum, pageSize) => {
   return await HttpClient.get(ApiPaths.user, { params: params })
 }
 
+const enableUser = async (userId) => {
+  return await HttpClient.post(ApiPaths.userEnable(userId))
+}
+
+const disableUser = async (userId) => {
+  return await HttpClient.post(ApiPaths.userDisable(userId))
+}
+
+const deleteUser = async (userId) => {
+  return await HttpClient.post(ApiPaths.userDelete(userId))
+}
+
 const UserService = {
-  login, logout, createUser, listUsers
+  login, logout, createUser, listUsers, enableUser, disableUser, deleteUser
 }
 
 export { UserService }

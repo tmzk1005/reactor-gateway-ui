@@ -16,6 +16,39 @@
       <a-col :span="24">
         <a-table :dataSource="userList" :columns="userFields" rowKey="id" :pagination="paginationConf" size="small"
           @change="tableChanged">
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.dataIndex === 'enabled'">
+              <span>
+                <a-tag :color="record.enabled ? 'green' : 'red'">
+                  {{ record.enabled ? "正常" : "禁用" }}
+                </a-tag>
+              </span>
+            </template>
+
+            <template v-else-if="column.key === 'action'">
+              <a-space>
+                <a-button type="link" style="padding: 0;"
+                  :style="{ color: userIsSysAdmin(record) ? 'gray' : (record.enabled ? 'red' : 'green') }"
+                  :disabled="userIsSysAdmin(record)" @click="switchUserEnableStatus(record)">
+                  <template #icon>
+                    <user-switch-outlined style="padding: 0; margin: 0;" />
+                  </template>
+                  {{ record.enabled ? "禁用" : "启用" }}
+                </a-button>
+
+                <a-popconfirm title="确认要删除用户吗?" ok-text="确认" cancel-text="取消" :disabled="userIsSysAdmin(record)"
+                  @confirm="() => deleteUser(record)">
+                  <a-button type="link" style="padding: 0; color: red;" :disabled="userIsSysAdmin(record)"
+                    :style="{ color: userIsSysAdmin(record) ? 'gray' : 'red' }">
+                    <template #icon>
+                      <delete-outlined style="padding: 0; margin: 0;" />
+                    </template>
+                    删除
+                  </a-button>
+                </a-popconfirm>
+              </a-space>
+            </template>
+          </template>
         </a-table>
       </a-col>
     </a-row>
@@ -68,10 +101,11 @@
 
 <script setup>
 import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
+import { DeleteOutlined, UserSwitchOutlined } from '@ant-design/icons-vue'
 import { reactive, ref } from 'vue'
 import { OrganizationService } from "@/services/organizationService"
 import { UserService } from "@/services/userService"
-import { RoleSelectOptions } from "@/utils/bizConstants"
+import { RoleSelectOptions, Role } from "@/utils/bizConstants"
 import { notification } from "ant-design-vue"
 import { PATTERN_NORMAL_NAME, PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
 import { DefaultPaginationConf } from "@/utils/bizConstants"
@@ -82,7 +116,7 @@ const createUserFormRef = ref()
 const userDto = reactive({
   username: "",
   nickname: "",
-  role: "NORMAL_USER",
+  role: Role.normalUser,
   organizationId: "",
   password: "",
   passpassComfirm: "",
@@ -91,7 +125,7 @@ const userDto = reactive({
 const clearUserDto = () => {
   userDto.username = ""
   userDto.nickname = ""
-  userDto.role = "NORMAL_USER"
+  userDto.role = Role.normalUser
   userDto.organizationId = ""
   userDto.password = ""
   userDto.passpassComfirm = ""
@@ -103,15 +137,49 @@ const userFields = [
   {
     title: "用户名",
     dataIndex: "username",
+    width: '150px',
+    ellipsis: true,
   },
   {
     title: "昵称",
     dataIndex: "nickname",
+    width: '150px',
+    ellipsis: true,
   },
   {
     title: "角色",
     dataIndex: "roleDisplay",
-  }
+    width: '150px',
+    ellipsis: true,
+  },
+  {
+    title: "所属组织",
+    dataIndex: "organizationName",
+    width: '180px',
+    ellipsis: true,
+  },
+  {
+    title: "电话",
+    dataIndex: "phone",
+    width: '150px',
+    ellipsis: true,
+  },
+  {
+    title: "邮件",
+    dataIndex: "email",
+    width: '200px',
+    ellipsis: true,
+  },
+  {
+    title: "启用状态",
+    dataIndex: "enabled",
+    width: '120px',
+    ellipsis: true,
+  },
+  {
+    title: "操作",
+    key: "action",
+  },
 ]
 
 const validatePasswordComfirm = async (_, value) => {
@@ -160,6 +228,8 @@ const userDtoRules = {
     { required: true, message: "请选择用户角色", trigger: "blur" },
   ]
 }
+
+const userIsSysAdmin = (user) => user.role == Role.systemAdmin && user.username == "admin"
 
 const organizationChoices = ref([])
 
@@ -211,6 +281,20 @@ const listUsers = (pageNum, pageSize) => {
 
 const tableChanged = (changedPaginationConf) => {
   listUsers(changedPaginationConf.current, changedPaginationConf.pageSize)
+}
+
+const switchUserEnableStatus = (user) => {
+  if (user.enabled) {
+    UserService.disableUser(user.id).then(() => user.enabled = false)
+  } else {
+    UserService.enableUser(user.id).then(() => user.enabled = true)
+  }
+}
+
+const deleteUser = (user) => {
+  UserService.deleteUser(user.id).then(() => {
+    listUsers(paginationConf.current, paginationConf.pageSize)
+  })
 }
 
 listUsers(paginationConf.current, paginationConf.pageSize)
