@@ -6,7 +6,7 @@
       <a-col :span="24">
         <a-page-header title="API" style="font-family: monospace;">
           <template #extra>
-            <a-button type="primary" @click="() => modalVisible = true" style="font-family: monospace;">新建API</a-button>
+            <a-button type="primary" @click="() => modalVisible = true" style="font-family: monospace;" v-if="sessionStore.isNormalUser">新建API</a-button>
           </template>
         </a-page-header>
       </a-col>
@@ -58,6 +58,9 @@ import { reactive, ref } from "vue"
 import { ApiService } from "@/services/apiService"
 import { DefaultPaginationConf } from "@/utils/bizConstants"
 import { colorForHttpMethod } from "@/utils/bizConstants"
+import { useSessionStore } from "@/stores/session"
+
+const sessionStore = useSessionStore()
 
 const modalVisible = ref(false)
 const paginationConf = reactive({ ...DefaultPaginationConf })
