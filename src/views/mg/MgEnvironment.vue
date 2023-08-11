@@ -24,7 +24,7 @@
         <a-modal width="50%" v-model:open="modalVisible" title="新建环境">
           <a-form ref="newEnvironmentFormRef" :model="newEnvironment" :rules="newEnvironmentRules" :label-col="{ span: 4 }"
             :wrapper-col="{ span: 24 }">
-            <a-form-item label="组织环境" name="name">
+            <a-form-item label="环境名称" name="name">
               <a-input v-model:value="newEnvironment.name" placeholder="请输入环境名称" />
             </a-form-item>
           </a-form>
@@ -82,7 +82,7 @@ const confirmAdd = () => {
   newEnvironmentFormRef.value.validate().then(() => {
     let dto = { name: newEnvironment.name }
     EnvironmentService.createEnvironment(dto).then(() => {
-      notification.success({ message: "新建组织成功" })
+      notification.success({ message: "新建环境成功" })
       modalVisible.value = false
       newEnvironment.name = null
       getEnvironments()
