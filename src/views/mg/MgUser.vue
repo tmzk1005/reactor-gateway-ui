@@ -78,6 +78,18 @@
               </a-select>
             </a-form-item>
 
+            <a-form-item label="电话" name="phone">
+              <a-input v-model:value="userDto.phone" placeholder="请输入用户电话" />
+            </a-form-item>
+
+            <a-form-item label="邮箱" name="email">
+              <a-input v-model:value="userDto.email" placeholder="请输入用户邮箱" />
+            </a-form-item>
+
+            <a-form-item label="地址" name="address">
+              <a-input v-model:value="userDto.address" placeholder="请输入用户地址" />
+            </a-form-item>
+
             <a-form-item has-feedback label="密码" name="password">
               <a-input v-model:value="userDto.password" type="password" autocomplete="new-password" placeholder="请输入密码" />
             </a-form-item>
@@ -107,7 +119,7 @@ import { OrganizationService } from "@/services/organizationService"
 import { UserService } from "@/services/userService"
 import { RoleSelectOptions, Role } from "@/utils/bizConstants"
 import { notification } from "ant-design-vue"
-import { PATTERN_NORMAL_NAME, PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
+import { PATTERN_NORMAL_NAME, PATTERN_NORMAL_NAME_ZH, PATTERN_PHONE } from "@/utils/patternConstants"
 import { DefaultPaginationConf } from "@/utils/bizConstants"
 
 const modalVisible = ref(false)
@@ -120,6 +132,9 @@ const userDto = reactive({
   organizationId: "",
   password: "",
   passpassComfirm: "",
+  phone: "",
+  email: "",
+  address: ""
 })
 
 const clearUserDto = () => {
@@ -129,6 +144,9 @@ const clearUserDto = () => {
   userDto.organizationId = ""
   userDto.password = ""
   userDto.passpassComfirm = ""
+  userDto.phone = ""
+  userDto.email = ""
+  userDto.address = ""
 }
 
 const userList = ref([])
@@ -161,13 +179,19 @@ const userFields = [
   {
     title: "电话",
     dataIndex: "phone",
-    width: '150px',
+    width: '120px',
     ellipsis: true,
   },
   {
     title: "邮件",
     dataIndex: "email",
-    width: '200px',
+    width: '150px',
+    ellipsis: true,
+  },
+  {
+    title: "地址",
+    dataIndex: "address",
+    width: '220px',
     ellipsis: true,
   },
   {
@@ -226,7 +250,25 @@ const userDtoRules = {
   ],
   role: [
     { required: true, message: "请选择用户角色", trigger: "blur" },
-  ]
+  ],
+  phone: [
+    { required: false, message: "请输入电话", trigger: "blur" },
+    { min: 7, message: "电话号码长度不能低于7个字符", trigger: "blur" },
+    { max: 32, message: "电话号码长度不能超过24个字符", trigger: "blur" },
+    {
+      pattern: PATTERN_PHONE,
+      message: "电话号码只能包含数字和短横线",
+      trigger: "blur",
+    },
+  ],
+  email: [
+    { required: false, message: "请输入邮箱", trigger: "blur" },
+    { max: 32, message: "邮箱长度不能超过56个字符", trigger: "blur" }
+  ],
+  address: [
+    { required: false, message: "请输入地址", trigger: "blur" },
+    { max: 256, message: "地址长度不能超过256个字符", trigger: "blur" }
+  ],
 }
 
 const userIsSysAdmin = (user) => user.role == Role.systemAdmin && user.username == "admin"
