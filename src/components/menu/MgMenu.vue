@@ -30,7 +30,7 @@
       <span><code>API</code>插件</span>
     </a-menu-item>
 
-    <a-menu-item key="userInfo">
+    <a-menu-item key="userInfo" @click="goToPage(RoutePaths.mgMyInfo)">
       <user-outlined />
       <span>我的信息</span>
     </a-menu-item>

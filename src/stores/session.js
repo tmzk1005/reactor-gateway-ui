@@ -10,6 +10,7 @@ const useSessionStore = defineStore('session', () => {
     nickname: window.localStorage.getItem("nickname"),
     role: window.localStorage.getItem("role"),
     organizationId: window.localStorage.getItem("organizationId"),
+    organizationName: window.localStorage.getItem("organizationName"),
     jwtToken: window.localStorage.getItem("jwtToken"),
     jwtExpireSeconds: parseInt(window.localStorage.getItem("jwtExpireSeconds")),
     loginTime: parseInt(window.localStorage.getItem("loginTime"))
@@ -21,6 +22,7 @@ const useSessionStore = defineStore('session', () => {
     userInfo.nickname = newUserInfo.nickname
     userInfo.role = newUserInfo.role
     userInfo.organizationId = newUserInfo.organizationId
+    userInfo.organizationName = newUserInfo.organizationName
     userInfo.jwtToken = newUserInfo.jwtToken
     userInfo.jwtExpireSeconds = newUserInfo.jwtExpireSeconds
     userInfo.loginTime = new Date().getTime() / 1000
@@ -30,6 +32,7 @@ const useSessionStore = defineStore('session', () => {
     window.localStorage.setItem("nickname", userInfo.nickname)
     window.localStorage.setItem("role", userInfo.role)
     window.localStorage.setItem("organizationId", userInfo.organizationId)
+    window.localStorage.setItem("organizationName", userInfo.organizationName)
     window.localStorage.setItem("jwtToken", userInfo.jwtToken)
     window.localStorage.setItem("jwtExpireSeconds", userInfo.jwtExpireSeconds.toString())
     window.localStorage.setItem("loginTime", userInfo.loginTime.toString())
@@ -41,6 +44,7 @@ const useSessionStore = defineStore('session', () => {
     userInfo.nickname = "未登录"
     userInfo.role = null
     userInfo.organizationId = null
+    userInfo.organizationName = null
     userInfo.jwtToken = null
     userInfo.jwtExpireSeconds = 0
     userInfo.loginTime = 0
@@ -50,6 +54,7 @@ const useSessionStore = defineStore('session', () => {
     window.localStorage.removeItem("nickname")
     window.localStorage.removeItem("role")
     window.localStorage.removeItem("organizationId")
+    window.localStorage.removeItem("organizationName")
     window.localStorage.removeItem("jwtToken")
     window.localStorage.removeItem("jwtExpireSeconds")
     window.localStorage.removeItem("loginTime")

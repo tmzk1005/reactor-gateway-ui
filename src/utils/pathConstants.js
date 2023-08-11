@@ -8,9 +8,11 @@ const RoutePaths = {
     mgApi: "/mg/api",
     mgAccessLog: "/mg/access-log",
     mgApiApply: "/mg/api-apply",
+    mgMyInfo: "/mg/my-info",
 
     mkIndex: "/mk",
-    mkLogin: "/mk/login"
+    mkLogin: "/mk/login",
+    mkMyInfo: "/mk/my-info",
 }
 
 const ApiPaths = {
@@ -19,6 +21,7 @@ const ApiPaths = {
     organization: "/organization",
     environment: "/environment",
     user: "/user",
+    userSelfDetail: "/user/me",
     userEnable: (userId) => `/user/_enable/${userId}`,
     userDisable: (userId) => `/user/_disable/${userId}`,
     userDelete: (userId) => `/user/_delete/${userId}`,

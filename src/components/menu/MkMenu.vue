@@ -15,7 +15,7 @@
       <span>我的申请</span>
     </a-menu-item>
 
-    <a-menu-item key="user">
+    <a-menu-item key="user" @click="goToPage(RoutePaths.mkMyInfo)">
       <user-outlined />
       <span>我的信息</span>
     </a-menu-item>

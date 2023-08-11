@@ -31,8 +31,12 @@ const deleteUser = async (userId) => {
   return await HttpClient.post(ApiPaths.userDelete(userId))
 }
 
+const getSelfDetailInfo = async () => {
+  return await HttpClient.get(ApiPaths.userSelfDetail)
+}
+
 const UserService = {
-  login, logout, createUser, listUsers, enableUser, disableUser, deleteUser
+  login, logout, createUser, listUsers, enableUser, disableUser, deleteUser, getSelfDetailInfo
 }
 
 export { UserService }

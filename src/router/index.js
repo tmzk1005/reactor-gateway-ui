@@ -37,12 +37,23 @@ const apiManagementRoutes = {
       path: RoutePaths.mgApiApply,
       component: () => import("@/views/mg/ApiApply.vue")
     },
+    {
+      path: RoutePaths.mgMyInfo,
+      component: () => import("@/views/common/MyInfo.vue")
+    },
   ]
 }
 
 const apiMarketRoutes = {
   path: RoutePaths.mkIndex,
   component: () => import("@/views/mk/MkIndex.vue"),
+  redirect: RoutePaths.mkMyInfo,
+  children: [
+    {
+      path: RoutePaths.mkMyInfo,
+      component: () => import("@/views/common/MyInfo.vue")
+    },
+  ]
 }
 
 const router = createRouter({
