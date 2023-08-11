@@ -35,8 +35,12 @@ const getSelfDetailInfo = async () => {
   return await HttpClient.get(ApiPaths.userSelfDetail)
 }
 
+const updatePassword = async (oldPassword, newPassword) => {
+  return await HttpClient.post(ApiPaths.userPasswordUpdate, { oldPassword: oldPassword, newPassword: newPassword })
+}
+
 const UserService = {
-  login, logout, createUser, listUsers, enableUser, disableUser, deleteUser, getSelfDetailInfo
+  login, logout, createUser, listUsers, enableUser, disableUser, deleteUser, getSelfDetailInfo, updatePassword
 }
 
 export { UserService }

@@ -22,6 +22,7 @@ const ApiPaths = {
     environment: "/environment",
     user: "/user",
     userSelfDetail: "/user/me",
+    userPasswordUpdate: "/user/password/_update",
     userEnable: (userId) => `/user/_enable/${userId}`,
     userDisable: (userId) => `/user/_disable/${userId}`,
     userDelete: (userId) => `/user/_delete/${userId}`,
