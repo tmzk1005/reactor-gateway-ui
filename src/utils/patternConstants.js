@@ -1,7 +1,7 @@
 const PATTERN_NORMAL_NAME = /^\w+$/g
 const PATTERN_NORMAL_NAME_ZH = /^[\w\u4e00-\u9fa5]+$/g
 
-const PATTERN_PHONE = /^[\d\-]{7,24}$/g
+const PATTERN_PHONE = /^[\d-]{7,24}$/g
 
 const PATTERN_VERSION = /^\d+\.\d+\.\d+$/g
 const PATTERN_DOMAIN = /^(?=^.{3,255}$)([a-zA-Z0-9]|[a-zA-Z0-9][-a-zA-Z0-9]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][-a-zA-Z0-9]{0,61}[a-zA-Z0-9]))+$/g

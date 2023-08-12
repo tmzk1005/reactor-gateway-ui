@@ -6,6 +6,7 @@ const RoutePaths = {
     mgEnvironment: "/mg/environment",
     mgUser: "/mg/user",
     mgApi: "/mg/api",
+    mgApiCreate: "/mg/api/create",
     mgAccessLog: "/mg/access-log",
     mgApiSubscription: "/mg/api-subscription",
     mgMyInfo: "/mg/my-info",
