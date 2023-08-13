@@ -1,7 +1,7 @@
 <template>
   <div class="p-container" :style="{ 'background-color': bgColor(data) }">
     <div>
-      <span class="p-name">{{ data.nameDisplay }}</span>
+      <span class="p-name">{{ data.name }}</span>
       <span class="p-version">{{ data.version }}</span>
       <span class="p-extra">
         <slot name="extra"></slot>

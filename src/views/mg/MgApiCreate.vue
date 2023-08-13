@@ -106,59 +106,9 @@ import { RoutePaths } from '@/utils/pathConstants'
 import ApiPlugin from "@/components/api/ApiPlugin.vue"
 import ApiPluginInstance from "@/components/api/ApiPluginInstance.vue"
 import { reactive, ref } from 'vue'
+import { PluginService } from '@/services/pluginService'
 
-const apiPlugins = ref([
-  {
-    id: "1",
-    name: "rateLimit",
-    nameDisplay: "限流",
-    version: "1.0.0",
-    description: "限制API的调用频率限制API的调用频率限制API的调用频率限制API的调用频率限制API的调用频率",
-    tail: false,
-    used: false,
-    draggable: true,
-  },
-  {
-    id: "2",
-    name: "circuit-breaker",
-    nameDisplay: "熔断",
-    version: "1.0.0",
-    description: "熔断",
-    tail: false,
-    used: false,
-    draggable: true,
-  },
-  {
-    id: "3",
-    name: "auth",
-    nameDisplay: "认证",
-    version: "1.0.0",
-    description: "认证",
-    tail: false,
-    used: false,
-    draggable: true,
-  },
-  {
-    id: "4",
-    name: "Mock",
-    nameDisplay: "Mock",
-    version: "1.0.0",
-    description: "Mock",
-    tail: true,
-    used: false,
-    draggable: true,
-  },
-  {
-    id: "5",
-    name: "HTTP-route",
-    nameDisplay: "HTTP转发",
-    version: "1.0.0",
-    description: "HTTP转发",
-    tail: true,
-    used: false,
-    draggable: true,
-  },
-])
+const apiPlugins = ref([])
 
 const findPluginInApiPlugins = (pId) => {
   for (var i = 0; i < apiPlugins.value.length; i++) {
@@ -320,6 +270,16 @@ const removeFormPluginChain = (pId) => {
   }
 }
 
+const loadAllPlugins = () => {
+  PluginService.getAllPlugins().then((data) => {
+    apiPlugins.value = data
+    for (var i = 0; i < apiPlugins.value.length; i++) {
+      apiPlugins.value[i].used = false
+      apiPlugins.value[i].draggable = true
+    }
+  })
+}
+loadAllPlugins()
 </script>
 
 <style scoped>

@@ -28,6 +28,7 @@ const ApiPaths = {
     userDisable: (userId) => `/user/_disable/${userId}`,
     userDelete: (userId) => `/user/_delete/${userId}`,
     api: "/api",
+    plugin: "/plugin",
 }
 
 export { RoutePaths, ApiPaths }
