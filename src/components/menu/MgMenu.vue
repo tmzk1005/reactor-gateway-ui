@@ -5,10 +5,20 @@
       <span>仪表板</span>
     </a-menu-item>
 
-    <a-menu-item key="api" @click="goToPage(RoutePaths.mgApi)">
-      <api-outlined />
-      <span><code>API</code></span>
-    </a-menu-item>
+    <a-sub-menu>
+      <template #title>
+        <api-outlined />
+        <span><code>API管理</code></span>
+      </template>
+      <a-menu-item key="api" @click="goToPage(RoutePaths.mgApi)">
+        <api-outlined />
+        <span><code>API查看</code></span>
+      </a-menu-item>
+      <a-menu-item key="apiCreate" @click="goToPage(RoutePaths.mgApiCreate)">
+        <plus-circle-outlined />
+        <span><code>新建API</code></span>
+      </a-menu-item>
+    </a-sub-menu>
 
     <a-menu-item key="accessLog" @click="goToPage(RoutePaths.mgAccessLog)">
       <snippets-outlined />
@@ -56,12 +66,12 @@
 <script setup>
 import {
   ApiOutlined, AreaChartOutlined, DeliveredProcedureOutlined, TeamOutlined, GroupOutlined,
-  SnippetsOutlined, UserOutlined, UsbOutlined, EnvironmentOutlined, ClusterOutlined
+  SnippetsOutlined, UserOutlined, UsbOutlined, EnvironmentOutlined, ClusterOutlined, PlusCircleOutlined
 } from '@ant-design/icons-vue'
 
 import { useSessionStore } from "@/stores/session"
 import { useRouter } from "vue-router"
-import { RoutePaths} from "@/utils/pathConstants"
+import { RoutePaths } from "@/utils/pathConstants"
 
 const sessionStore = useSessionStore()
 const router = useRouter()
