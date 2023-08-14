@@ -143,7 +143,7 @@ const dragContext = {
   pluginInstance: null,
   enteredZone2: false,
   pushedTempItem: false,
-  fromZone: "",
+  fromZone: null,
 }
 
 const setPointerEventsOfZone2Children = (boolValue) => {
@@ -169,6 +169,7 @@ const dragStartZone2 = (_, item) => {
 
 const _dragEnd = (evt) => {
   evt.preventDefault()
+  dragContext.fromZone = null
   dragContext.enteredZone2 = false
   dragContext.pushedTempItem = false
   dragContext.pluginInstance = null
@@ -198,8 +199,12 @@ const dragEndZone2 = (evt) => {
 
 const dragEnterZone2 = (evt) => {
   console.log('dragEnterZone2')
-  console.log('dragEnterZone2')
   evt.preventDefault()
+
+  if (dragContext.fromZone == null) {
+    return false
+  }
+
   if (dragContext.enteredZone2 || dragContext.pushedTempItem) {
     return
   }
@@ -219,6 +224,11 @@ const dragEnterZone2 = (evt) => {
 const dragLeaveZone2 = (evt) => {
   console.log('dragLeaveZone2')
   evt.preventDefault()
+
+  if (dragContext.fromZone == null) {
+    return false
+  }
+
   dragContext.enteredZone2 = false
   if (dragContext.pushedTempItem) {
     dragContext.pushedTempItem = false
@@ -230,6 +240,10 @@ const dragLeaveZone2 = (evt) => {
 const dragOverZone2 = (evt) => {
   // console.log('dragOverZone2')
   evt.preventDefault()
+
+  if (dragContext.fromZone == null) {
+    return false
+  }
 }
 
 const pluginInstanceFromType = (pluginType) => {
@@ -249,6 +263,11 @@ const pluginInstanceFromType = (pluginType) => {
 const dragDropZone2 = (evt) => {
   console.log("dragDropZone2")
   console.log("to do", evt)
+
+  if (dragContext.fromZone == null) {
+    return false
+  }
+
   if (dragContext.fromZone == '1') {
     dragContext.pluginType.used = true
     dragContext.pluginInstance.temp = false
