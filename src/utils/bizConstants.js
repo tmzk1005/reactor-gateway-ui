@@ -1,17 +1,13 @@
 const Role = {
   systemAdmin: 'SYSTEM_ADMIN',
-  securityAdmin: 'SECURITY_ADMIN',
-  auditAdmin: 'AUDIT_ADMIN',
   normalUser: 'NORMAL_USER',
   organizationAdmin: 'ORGANIZATION_ADMIN',
 }
 
 const RoleSelectOptions = [
   { label: "普通用户", value: "NORMAL_USER" },
-  { label: "系统管理员", value: "SYSTEM_ADMIN" },
   { label: "组织管理员", value: "ORGANIZATION_ADMIN" },
-  { label: "审计管理员", value: "AUDIT_ADMIN" },
-  { label: "安全管理员", value: "SECURITY_ADMIN" }
+  { label: "系统管理员", value: "SYSTEM_ADMIN" },
 ]
 
 const DefaultPaginationConf = {
