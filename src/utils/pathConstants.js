@@ -21,6 +21,7 @@ const ApiPaths = {
     login: "/user/_login",
     organization: "/organization",
     environment: "/environment",
+    environmentBinding: "/environment/binding",
     user: "/user",
     userSelfDetail: "/user/me",
     userPasswordUpdate: "/user/password/_update",

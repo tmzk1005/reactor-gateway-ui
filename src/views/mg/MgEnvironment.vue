@@ -6,7 +6,7 @@
       <a-col :span="24">
         <a-page-header title="环境">
           <template #extra>
-            <a-button type="primary" @click="() => modalVisible = true" v-if="sessionStore.isSystemAdmin" >新建环境</a-button>
+            <a-button type="primary" @click="() => modalVisible = true" v-if="sessionStore.isSystemAdmin">新建环境</a-button>
           </template>
         </a-page-header>
       </a-col>
@@ -15,6 +15,11 @@
     <a-row type="flex" justify="center">
       <a-col :span="24">
         <a-table :dataSource="environmentList" :columns="environmentFields" rowKey="id" size="small" :pagination="false">
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.dataIndex === 'name'">
+              <a-button type="link" style="padding: 0;" @click="showEnvVars(record.id, null)">{{ record.name }}</a-button>
+            </template>
+          </template>
         </a-table>
       </a-col>
     </a-row>
@@ -22,14 +27,26 @@
     <a-row type="flex" justify="center">
       <a-col :span="24">
         <a-modal width="50%" v-model:open="modalVisible" title="新建环境">
-          <a-form ref="newEnvironmentFormRef" :model="newEnvironment" :rules="newEnvironmentRules" :label-col="{ span: 4 }"
-            :wrapper-col="{ span: 24 }">
+          <a-form ref="newEnvironmentFormRef" :model="newEnvironment" :rules="newEnvironmentRules"
+            :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }">
             <a-form-item label="环境名称" name="name">
               <a-input v-model:value="newEnvironment.name" placeholder="请输入环境名称" />
             </a-form-item>
           </a-form>
           <template #footer>
             <a-button key="submit" type="primary" @click="confirmAdd">确认</a-button>
+          </template>
+        </a-modal>
+      </a-col>
+    </a-row>
+
+    <a-row type="flex" justify="center">
+      <a-col :span="24">
+        <a-modal width="80%" v-model:open="showEnvVarsModalVisible" title="环境变量">
+          <a-table :dataSource="oneOrgEnvVars" :columns="envVarFileds" rowKey="key" size="small" :pagination="false">
+          </a-table>
+          <template #footer>
+            <a-button key="saveEnvs" type="primary">保存</a-button>
           </template>
         </a-modal>
       </a-col>
@@ -48,13 +65,21 @@ import { useSessionStore } from "@/stores/session"
 
 const sessionStore = useSessionStore()
 const modalVisible = ref(false)
+const showEnvVarsModalVisible = ref(false)
 const environmentList = ref([])
 const newEnvironmentFormRef = ref()
 
+const oneOrgEnvVars = ref([])
+
 const environmentFields = [
-  { title: "环境ID", dataIndex: "id", width: '120px', minWidth: '120px' },
-  { title: "环境名称", dataIndex: "name" },
+  { title: "环境名称", dataIndex: "name", width: '200px', minWidth: '200px' },
+  { title: "环境ID", dataIndex: "id", width: '240px', minWidth: '240px' },
   { title: "创建时间", dataIndex: "createdDate" }
+]
+
+const envVarFileds = [
+  { title: "变量名", dataIndex: "key" },
+  { title: "变量值", dataIndex: "value" },
 ]
 
 const newEnvironmentRules = {
@@ -89,6 +114,16 @@ const confirmAdd = () => {
       newEnvironment.name = null
       getEnvironments()
     })
+  })
+}
+
+const showEnvVars = (envId, orgId) => {
+  showEnvVarsModalVisible.value = true
+  if (orgId == null) {
+    orgId = sessionStore.userInfo.organizationId
+  }
+  EnvironmentService.getVarsInEnv(envId, orgId).then((data) => {
+    oneOrgEnvVars.value = data.variableList
   })
 }
 
