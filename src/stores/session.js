@@ -64,11 +64,13 @@ const useSessionStore = defineStore('session', () => {
 
   const isSystemAdmin = computed(() => isAuthenticated.value && userInfo.role == Role.systemAdmin)
 
-  const isNormalUser = computed(() => isAuthenticated.value && userInfo.role == Role.normalUser)
+  const isOrgAdmin = computed(() => isAuthenticated.value && userInfo.role == Role.organizationAdmin)
+
+  const isNormalUser = computed(() => isAuthenticated.value && (userInfo.role == Role.normalUser || userInfo.role == Role.organizationAdmin))
 
   const token = computed(() => userInfo.jwtToken)
 
-  return { userInfo, token, setUser, clear, isAuthenticated, isSystemAdmin, isNormalUser }
+  return { userInfo, token, setUser, clear, isAuthenticated, isSystemAdmin, isNormalUser, isOrgAdmin }
 })
 
 export { useSessionStore }

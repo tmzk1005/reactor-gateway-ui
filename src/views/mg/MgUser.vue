@@ -6,7 +6,7 @@
       <a-col :span="24">
         <a-page-header title="用户">
           <template #extra>
-            <a-button type="primary" @click="addUserClicked">新增用户</a-button>
+            <a-button type="primary" @click="addUserClicked" v-if="sessionStore.isSystemAdmin">新增用户</a-button>
           </template>
         </a-page-header>
       </a-col>
@@ -37,7 +37,7 @@
                 </a-button>
 
                 <a-popconfirm title="确认要删除用户吗?" ok-text="确认" cancel-text="取消" :disabled="userIsSysAdmin(record)"
-                  @confirm="() => deleteUser(record)">
+                  @confirm="() => deleteUser(record)" v-if="sessionStore.isSystemAdmin">
                   <a-button type="link" style="padding: 0; color: red;" :disabled="userIsSysAdmin(record)"
                     :style="{ color: userIsSysAdmin(record) ? 'gray' : 'red' }">
                     <template #icon>
@@ -121,7 +121,9 @@ import { RoleSelectOptions, Role } from "@/utils/bizConstants"
 import { notification } from "ant-design-vue"
 import { PATTERN_NORMAL_NAME, PATTERN_NORMAL_NAME_ZH, PATTERN_PHONE } from "@/utils/patternConstants"
 import { DefaultPaginationConf } from "@/utils/bizConstants"
+import { useSessionStore } from "@/stores/session"
 
+const sessionStore = useSessionStore()
 const modalVisible = ref(false)
 const paginationConf = reactive({ ...DefaultPaginationConf })
 const createUserFormRef = ref()

@@ -6,7 +6,7 @@
       <a-col :span="24">
         <a-page-header title="环境">
           <template #extra>
-            <a-button type="primary" @click="() => modalVisible = true">新建环境</a-button>
+            <a-button type="primary" @click="() => modalVisible = true" v-if="sessionStore.isSystemAdmin" >新建环境</a-button>
           </template>
         </a-page-header>
       </a-col>
@@ -44,7 +44,9 @@ import { reactive, ref } from "vue"
 import { notification } from "ant-design-vue"
 import { EnvironmentService } from "@/services/environmentService"
 import { PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
+import { useSessionStore } from "@/stores/session"
 
+const sessionStore = useSessionStore()
 const modalVisible = ref(false)
 const environmentList = ref([])
 const newEnvironmentFormRef = ref()

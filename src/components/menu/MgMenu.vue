@@ -14,7 +14,7 @@
         <api-outlined />
         <span><code>API查看</code></span>
       </a-menu-item>
-      <a-menu-item key="apiCreate" @click="goToPage(RoutePaths.mgApiCreate)">
+      <a-menu-item key="apiCreate" @click="goToPage(RoutePaths.mgApiCreate)" v-if="sessionStore.isNormalUser">
         <plus-circle-outlined />
         <span><code>新建API</code></span>
       </a-menu-item>
@@ -45,7 +45,7 @@
       <span>我的信息</span>
     </a-menu-item>
 
-    <a-menu-item key="user" v-if="sessionStore.isSystemAdmin" @click="goToPage(RoutePaths.mgUser)">
+    <a-menu-item key="user" v-if="sessionStore.isSystemAdmin || sessionStore.isOrgAdmin" @click="goToPage(RoutePaths.mgUser)">
       <team-outlined />
       <span>用户管理</span>
     </a-menu-item>
