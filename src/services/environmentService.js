@@ -16,7 +16,17 @@ const getVarsInEnv = async (envId, orgId) => {
 
 const setVarsInEnv = async (envId, orgId, vars) => {
   const params = { envId: envId, orgId: orgId }
-  return await HttpClient.post(ApiPaths.environmentBinding, vars, { params: params })
+  let dto = {keyValues: []}
+  for (var i = 0; i < vars.length; i++) {
+    if (vars[i].deleted) {
+      continue
+    }
+    dto.keyValues.push({
+      key: vars[i].varName,
+      value: vars[i].varValue
+    })
+  }
+  return await HttpClient.post(ApiPaths.environmentBinding, dto, { params: params })
 }
 
 const EnvironmentService = {

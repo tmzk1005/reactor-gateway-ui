@@ -42,11 +42,51 @@
 
     <a-row type="flex" justify="center">
       <a-col :span="24">
-        <a-modal width="80%" v-model:open="showEnvVarsModalVisible" title="环境变量">
-          <a-table :dataSource="oneOrgEnvVars" :columns="envVarFileds" rowKey="key" size="small" :pagination="false">
+        <a-modal width="60%" v-model:open="showEnvVarsModalVisible" title="环境变量" :maskClosable="false">
+          <a-table v-if="showEnvVarsModalVisible" id="envVarsTable" :dataSource="oneOrgEnvVars" :columns="envVarFileds"
+            rowKey="varName" :pagination="false" :scroll="tableScrollConf">
+            <template #bodyCell="{ column, record }">
+
+              <template v-if="column.dataIndex == 'varValue'">
+                <span v-if="record.editing == record.varName">
+                  <a-input v-model:value="record.varValue" @pressEnter="saveEditedVar"></a-input>
+                </span>
+                <span v-else-if="!record.deleted">
+                  <span :style="{ color: record.changed() ? 'green' : '' }">{{ record.varValue }}</span>
+                  <a-button class="env-var-edit-btn" type="link"
+                    @click="startEdit(record)"><span><edit-outlined /></span></a-button>
+                </span>
+              </template>
+
+              <template v-else-if="column.dataIndex == 'varName'">
+                <span :style="{ color: record.changed() ? 'green' : '' }">{{ record.varName }}</span>
+              </template>
+
+              <template v-else-if="column.key == 'status'">
+                <a-tag v-if="record.deleted" style="color:red;">已删除</a-tag>
+                <a-tag v-else-if="record.changed()" style="color:green;">已更新</a-tag>
+              </template>
+
+              <template v-else-if="column.key == 'action'">
+                <a-button v-if="record.deleted" type="link" style="padding: 0; color: green;"
+                  @click="cancleDeleteVar(record)">
+                  <template #icon>
+                    <close-circle-outlined style="padding: 0; margin: 0;" />
+                  </template>
+                  恢复
+                </a-button>
+                <a-button v-else type="link" style="padding: 0; color: red;" @click="deleteVar(record)">
+                  <template #icon>
+                    <close-circle-outlined style="padding: 0; margin: 0;" />
+                  </template>
+                  删除
+                </a-button>
+              </template>
+            </template>
           </a-table>
           <template #footer>
-            <a-button key="saveEnvs" type="primary">保存</a-button>
+            <a-button key="cancleEditEnvs" @click="canelEditVars">取消编辑</a-button>
+            <a-button key="saveEnvs" type="primary" @click="saveEditVars">保存编辑</a-button>
           </template>
         </a-modal>
       </a-col>
@@ -57,7 +97,8 @@
 
 <script setup>
 import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
-import { reactive, ref } from "vue"
+import { EditOutlined, CloseCircleOutlined } from '@ant-design/icons-vue'
+import { onMounted, onUnmounted, reactive, ref } from "vue"
 import { notification } from "ant-design-vue"
 import { EnvironmentService } from "@/services/environmentService"
 import { PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
@@ -69,6 +110,7 @@ const showEnvVarsModalVisible = ref(false)
 const environmentList = ref([])
 const newEnvironmentFormRef = ref()
 
+let rawOneOrgEnvVars = []
 const oneOrgEnvVars = ref([])
 
 const environmentFields = [
@@ -77,9 +119,45 @@ const environmentFields = [
   { title: "创建时间", dataIndex: "createdDate" }
 ]
 
+const tableScrollConf = reactive({
+  y: window.innerHeight - 300
+})
+
+const windowResizeListener = () => {
+  tableScrollConf.y = window.innerHeight - 300
+}
+
+onMounted(() => {
+  window.addEventListener('resize', windowResizeListener)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', windowResizeListener)
+})
+
 const envVarFileds = [
-  { title: "变量名", dataIndex: "key" },
-  { title: "变量值", dataIndex: "value" },
+  {
+    title: "变量名",
+    dataIndex: "varName",
+    width: '200px',
+    minWidth: '200px'
+  },
+  {
+    title: "变量值",
+    dataIndex: "varValue",
+  },
+  {
+    title: "状态",
+    key: "status",
+    width: '200px',
+    minWidth: '200px'
+  },
+  {
+    title: "操作",
+    key: "action",
+    width: '200px',
+    minWidth: '200px'
+  },
 ]
 
 const newEnvironmentRules = {
@@ -117,15 +195,105 @@ const confirmAdd = () => {
   })
 }
 
+const startEdit = (record) => {
+  for (var i = 0; i < oneOrgEnvVars.value.length; i++) {
+    oneOrgEnvVars.value[i].editing = null
+  }
+  record.editing = record.varName
+}
+
+const saveEditedVar = () => {
+  for (var i = 0; i < oneOrgEnvVars.value.length; i++) {
+    oneOrgEnvVars.value[i].editing = null
+    if (oneOrgEnvVars.value[i].changed() && !oneOrgEnvVars.value[i].deleted) {
+      let ele = document.querySelector(`tbody.ant-table-tbody > tr[data-row-key=${oneOrgEnvVars.value[i].varName}]`)
+      ele.style.backgroundColor = 'bisque'
+    }
+  }
+}
+
+const deleteVar = (record) => {
+  record.deleted = true
+  let ele = document.querySelector(`tbody.ant-table-tbody > tr[data-row-key=${record.varName}]`)
+  ele.style.backgroundColor = '#999999'
+  ele.style.opacity = 0.5
+}
+
+const cancleDeleteVar = (record) => {
+  record.deleted = false
+  let ele = document.querySelector(`tbody.ant-table-tbody > tr[data-row-key=${record.varName}]`)
+  ele.style.backgroundColor = ''
+  ele.style.opacity = 1
+}
+
+const canelEditVars = () => {
+  let tmpArr = []
+  for (var i = 0; i < rawOneOrgEnvVars.length; i++) {
+    let item = { ...rawOneOrgEnvVars[i] }
+    item.editing = null
+    item.deleted = false
+    item.rawVarValue = item.varValue
+    item.changed = () => item.varValue != item.rawVarValue
+    tmpArr.push(item)
+
+    let ele = document.querySelector(`tbody.ant-table-tbody > tr[data-row-key=${item.varName}]`)
+
+    if (ele) {
+      ele.style.backgroundColor = null
+      ele.style.opacity = 1
+    }
+  }
+  oneOrgEnvVars.value = tmpArr
+  currentEditEnv = null
+}
+
+let currentEditEnv = null
+
 const showEnvVars = (envId, orgId) => {
   showEnvVarsModalVisible.value = true
   if (orgId == null) {
     orgId = sessionStore.userInfo.organizationId
   }
   EnvironmentService.getVarsInEnv(envId, orgId).then((data) => {
-    oneOrgEnvVars.value = data.variableList
+    showVarsInModal(data)
+    currentEditEnv = envId
+  })
+}
+
+const showVarsInModal = (data) => {
+  rawOneOrgEnvVars = data.variableList
+  if (rawOneOrgEnvVars.length == 0) {
+    // for test
+    for (var i = 0; i < 5; i++) {
+      rawOneOrgEnvVars.push({
+        varName: "name" + i,
+        varValue: "value" + i
+      })
+    }
+  }
+  canelEditVars()
+}
+
+
+const saveEditVars = () => {
+  EnvironmentService.setVarsInEnv(currentEditEnv, sessionStore.userInfo.organizationId, oneOrgEnvVars.value).then((data) => {
+    notification.success({
+      message: "保存环境变量成功",
+      duration: 2,
+    })
+    showVarsInModal(data)
   })
 }
 
 getEnvironments()
 </script>
+
+<style scoped>
+.ant-table-cell .env-var-edit-btn {
+  visibility: hidden;
+}
+
+.ant-table-cell:hover .env-var-edit-btn {
+  visibility: visible;
+}
+</style>
