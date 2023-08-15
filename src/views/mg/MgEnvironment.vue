@@ -45,7 +45,7 @@
         <a-modal width="60%" v-model:open="showEnvVarsModalVisible" title="环境变量" :maskClosable="false">
           <a-table v-if="showEnvVarsModalVisible" id="envVarsTable" :dataSource="oneOrgEnvVars" :columns="envVarFileds"
             rowKey="varName" :pagination="false" :scroll="tableScrollConf">
-            <template #bodyCell="{ column, record }">
+            <template #bodyCell="{ index, column, record }">
 
               <template v-if="column.dataIndex == 'varValue'">
                 <span v-if="record.editing == record.varName">
@@ -53,8 +53,9 @@
                 </span>
                 <span v-else-if="!record.deleted">
                   <span :style="{ color: record.changed() ? 'green' : '' }">{{ record.varValue }}</span>
-                  <a-button class="env-var-edit-btn" type="link"
-                    @click="startEdit(record)"><span><edit-outlined /></span></a-button>
+                  <a-button class="env-var-edit-btn" type="link" @click="startEdit(record)">
+                    <span><edit-outlined /></span>
+                  </a-button>
                 </span>
               </template>
 
@@ -65,6 +66,7 @@
               <template v-else-if="column.key == 'status'">
                 <a-tag v-if="record.deleted" style="color:red;">已删除</a-tag>
                 <a-tag v-else-if="record.changed()" style="color:green;">已更新</a-tag>
+                <a-tag v-else-if="record.isNew" style="color:blue;">新增</a-tag>
               </template>
 
               <template v-else-if="column.key == 'action'">
@@ -75,7 +77,7 @@
                   </template>
                   恢复
                 </a-button>
-                <a-button v-else type="link" style="padding: 0; color: red;" @click="deleteVar(record)">
+                <a-button v-else type="link" style="padding: 0; color: red;" @click="deleteVar(record, index)">
                   <template #icon>
                     <close-circle-outlined style="padding: 0; margin: 0;" />
                   </template>
@@ -85,7 +87,12 @@
             </template>
           </a-table>
           <template #footer>
-            <a-button key="cancleEditEnvs" @click="canelEditVars">取消编辑</a-button>
+            <a-space style="float: left;">
+              <a-input style="width: 250px;" placeholder="请输入新环境变量名" v-model:value="newEnvVar.varName"></a-input>
+              <a-input style="width: 400px;" placeholder="请输入新环境变量值" v-model:value="newEnvVar.varValue"></a-input>
+              <a-button type="primary" key="cancleEditEnvs" @click="addNewEnvVar">添加环境变量</a-button>
+            </a-space>
+            <a-button key="cancleEditEnvs" @click="canelEditVars">重置</a-button>
             <a-button key="saveEnvs" type="primary" @click="saveEditVars">保存编辑</a-button>
           </template>
         </a-modal>
@@ -212,7 +219,13 @@ const saveEditedVar = () => {
   }
 }
 
-const deleteVar = (record) => {
+const deleteVar = (record, index) => {
+  if (record.isNew) {
+    console.log('remove new')
+    oneOrgEnvVars.value.splice(index, 1)
+    return
+  }
+
   record.deleted = true
   let ele = document.querySelector(`tbody.ant-table-tbody > tr[data-row-key=${record.varName}]`)
   ele.style.backgroundColor = '#999999'
@@ -244,12 +257,12 @@ const canelEditVars = () => {
     }
   }
   oneOrgEnvVars.value = tmpArr
-  currentEditEnv = null
 }
 
 let currentEditEnv = null
 
 const showEnvVars = (envId, orgId) => {
+  currentEditEnv = envId
   showEnvVarsModalVisible.value = true
   if (orgId == null) {
     orgId = sessionStore.userInfo.organizationId
@@ -283,6 +296,47 @@ const saveEditVars = () => {
     })
     showVarsInModal(data)
   })
+}
+
+const newEnvVar = reactive({
+  varName: "",
+  varValue: ""
+})
+
+const addNewEnvVar = () => {
+  if (!newEnvVar.varName || newEnvVar.varName.trim() == '') {
+    notification.error({ message: "新环境变量名称不能为空", duration: 3, })
+    return
+  }
+
+  for (var i = 0; i < oneOrgEnvVars.value.length; i++) {
+    if (newEnvVar.varName == oneOrgEnvVars.value[i].varName) {
+      notification.error({ message: "新环境变量名称不能和已有的环境变量名重复", duration: 3, })
+      return
+    }
+  }
+  let rgx = /^\w{3,32}$/g
+  if (!rgx.test(newEnvVar.varName)) {
+    notification.error({ message: "新环境变量名称只能包含字母,数字以及下划线,且长度大于等于3,小于等于32", duration: 3, })
+    return
+  }
+
+  if (!newEnvVar.varValue) {
+    newEnvVar.varValue = ''
+  }
+
+  newEnvVar.varName = newEnvVar.varName.trim()
+
+  oneOrgEnvVars.value.push({
+    varName: newEnvVar.varName,
+    varValue: newEnvVar.varValue,
+    isNew: true,
+    deleted: false,
+    rawVarValue: null,
+    changed: () => false
+  })
+  newEnvVar.varName = ""
+  newEnvVar.varValue = ""
 }
 
 getEnvironments()
