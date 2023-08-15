@@ -17,7 +17,7 @@
         <a-table :dataSource="environmentList" :columns="environmentFields" rowKey="id" size="small" :pagination="false">
           <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'name'">
-              <a-button type="link" style="padding: 0;" @click="showEnvVars(record.id, null)">{{ record.name }}</a-button>
+              <a-button type="link" style="padding: 0;" @click="showEnvVars(record.id, record.name, null)">{{ record.name }}</a-button>
             </template>
           </template>
         </a-table>
@@ -42,7 +42,7 @@
 
     <a-row type="flex" justify="center">
       <a-col :span="24">
-        <a-modal width="60%" v-model:open="showEnvVarsModalVisible" title="环境变量" :maskClosable="false">
+        <a-modal width="60%" v-model:open="showEnvVarsModalVisible" :title="modalTitle" :maskClosable="false">
           <a-table v-if="showEnvVarsModalVisible" id="envVarsTable" :dataSource="oneOrgEnvVars" :columns="envVarFileds"
             rowKey="varName" :pagination="false" :scroll="tableScrollConf">
             <template #bodyCell="{ index, column, record }">
@@ -99,6 +99,19 @@
       </a-col>
     </a-row>
 
+    <a-row>
+      <a-col :span="24">
+        <a-modal width="60%" v-model:open="showEnvVarsModalForSystemAdminVisible" :title="modalTitle" :footer="null">
+          <a-select v-model:value="organization.id" style="width: 400px; padding: 15px 0;" :default-active-first-option="false"
+            :show-arrow="true" :filter-option="true" :not-found-content="null" :options="organizationChoices" @select="selectOrg">
+          </a-select>
+          <a-table v-if="showEnvVarsModalForSystemAdminVisible" :dataSource="oneOrgEnvVars"
+            :columns="readonlyEnvVarFileds" rowKey="varName" :pagination="false" :scroll="tableScrollConf">
+          </a-table>
+        </a-modal>
+      </a-col>
+    </a-row>
+
   </a-layout>
 </template>
 
@@ -108,17 +121,21 @@ import { EditOutlined, CloseCircleOutlined } from '@ant-design/icons-vue'
 import { onMounted, onUnmounted, reactive, ref } from "vue"
 import { notification } from "ant-design-vue"
 import { EnvironmentService } from "@/services/environmentService"
+import { OrganizationService } from "@/services/organizationService"
 import { PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
 import { useSessionStore } from "@/stores/session"
 
 const sessionStore = useSessionStore()
 const modalVisible = ref(false)
 const showEnvVarsModalVisible = ref(false)
+const showEnvVarsModalForSystemAdminVisible = ref(false)
 const environmentList = ref([])
 const newEnvironmentFormRef = ref()
 
 let rawOneOrgEnvVars = []
 const oneOrgEnvVars = ref([])
+
+const modalTitle = ref("")
 
 const environmentFields = [
   { title: "环境名称", dataIndex: "name", width: '200px', minWidth: '200px' },
@@ -141,6 +158,19 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', windowResizeListener)
 })
+
+const readonlyEnvVarFileds = [
+  {
+    title: "变量名",
+    dataIndex: "varName",
+    width: '200px',
+    minWidth: '200px'
+  },
+  {
+    title: "变量值",
+    dataIndex: "varValue",
+  },
+]
 
 const envVarFileds = [
   {
@@ -260,16 +290,52 @@ const canelEditVars = () => {
 }
 
 let currentEditEnv = null
+let currentEditEnvName = null
 
-const showEnvVars = (envId, orgId) => {
+const organizationChoices = ref([])
+
+const fetchOrganizations = () => {
+  OrganizationService.getOrganizations().then((data) => {
+    let arr = []
+    data.forEach(element => {
+      arr.push({ label: element.name, value: element.id })
+    })
+    organizationChoices.value = arr
+  })
+}
+
+const organization = reactive({
+  id: "",
+  name: "",
+})
+
+const showEnvVars = (envId, envName, org) => {
   currentEditEnv = envId
-  showEnvVarsModalVisible.value = true
-  if (orgId == null) {
-    orgId = sessionStore.userInfo.organizationId
+  currentEditEnvName = envName
+
+  if (org == null) {
+    organization.id = sessionStore.userInfo.organizationId
+    organization.name = sessionStore.userInfo.organizationName
+  } else {
+    organization.id = org.id
+    organization.name = org.name
   }
-  EnvironmentService.getVarsInEnv(envId, orgId).then((data) => {
+
+  if (sessionStore.isNormalUser) {
+    showEnvVarsModalForSystemAdminVisible.value = false
+    showEnvVarsModalVisible.value = true
+  } else {
+    showEnvVarsModalVisible.value = false
+    showEnvVarsModalForSystemAdminVisible.value = true
+    if (organizationChoices.value.length == 0) {
+      fetchOrganizations()
+    }
+  }
+  modalTitle.value = `${organization.name} ${currentEditEnvName}`
+  EnvironmentService.getVarsInEnv(envId, organization.id).then((data) => {
     showVarsInModal(data)
     currentEditEnv = envId
+    currentEditEnvName = envName
   })
 }
 
@@ -337,6 +403,20 @@ const addNewEnvVar = () => {
   })
   newEnvVar.varName = ""
   newEnvVar.varValue = ""
+}
+
+const selectOrg = (orgId) => {
+  if (orgId == organization.id) {
+    return
+  }
+  let org = {id: orgId, name: null}
+  for (var i = 0; i < organizationChoices.value.length; i++) {
+    if (orgId == organizationChoices.value[i].value) {
+      org.name = organizationChoices.value[i].label
+      break
+    }
+  }
+  showEnvVars(currentEditEnv, currentEditEnvName, org)
 }
 
 getEnvironments()
