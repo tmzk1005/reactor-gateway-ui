@@ -84,9 +84,9 @@
             </a-page-header>
 
             <a-page-header style="border: 1px solid rgb(235, 237, 240); margin-top: 20px;" title="配置 Json Scema">
-              <p>
-                {{ pluginToShow.jsonSchema }}
-              </p>
+              <div>
+                <highlightjs language="json" :code="JSON.stringify(JSON.parse(pluginToShow.jsonSchema), null, 4)" />
+              </div>
             </a-page-header>
 
             <a-page-header style="border: 1px solid rgb(235, 237, 240); margin-top: 20px" title="文档">
