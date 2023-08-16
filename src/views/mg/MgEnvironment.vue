@@ -341,15 +341,6 @@ const showEnvVars = (envId, envName, org) => {
 
 const showVarsInModal = (data) => {
   rawOneOrgEnvVars = data.variableList
-  if (rawOneOrgEnvVars.length == 0) {
-    // for test
-    for (var i = 0; i < 5; i++) {
-      rawOneOrgEnvVars.push({
-        varName: "name" + i,
-        varValue: "value" + i
-      })
-    }
-  }
   canelEditVars()
 }
 
