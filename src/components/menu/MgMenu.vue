@@ -35,7 +35,7 @@
       <span>环境</span>
     </a-menu-item>
 
-    <a-menu-item key="apiPlugin">
+    <a-menu-item key="apiPlugin" @click="goToPage(RoutePaths.mgPlugin)">
       <usb-outlined />
       <span><code>API</code>插件</span>
     </a-menu-item>
