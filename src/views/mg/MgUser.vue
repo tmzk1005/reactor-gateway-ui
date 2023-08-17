@@ -119,8 +119,8 @@ import { OrganizationService } from "@/services/organizationService"
 import { UserService } from "@/services/userService"
 import { RoleSelectOptions, Role } from "@/utils/bizConstants"
 import { notification } from "ant-design-vue"
-import { PATTERN_NORMAL_NAME, PATTERN_NORMAL_NAME_ZH, PATTERN_PHONE } from "@/utils/patternConstants"
-import { DefaultPaginationConf } from "@/utils/bizConstants"
+import { PATTERN_NORMAL_NAME } from "@/utils/patternConstants"
+import { DefaultPaginationConf, userBaseInfoFormCheckRule } from "@/utils/bizConstants"
 import { useSessionStore } from "@/stores/session"
 
 const sessionStore = useSessionStore()
@@ -229,16 +229,6 @@ const userDtoRules = {
       trigger: "blur",
     },
   ],
-  nickname: [
-    { required: true, message: "请输入昵称", trigger: "blur" },
-    { min: 2, message: "昵称至少需要包含2个字符", trigger: "blur" },
-    { max: 32, message: "昵称长度不能超过32个字符", trigger: "blur" },
-    {
-      pattern: PATTERN_NORMAL_NAME_ZH,
-      message: "昵称只能包含字母,数字,下划线,以及中文字符",
-      trigger: "blur",
-    },
-  ],
   password: [
     { required: true, message: "请输入密码", trigger: "blur" },
     { min: 8, message: "密码至少需要包含8个字符", trigger: "blur" },
@@ -253,24 +243,10 @@ const userDtoRules = {
   role: [
     { required: true, message: "请选择用户角色", trigger: "blur" },
   ],
-  phone: [
-    { required: false, message: "请输入电话", trigger: "blur" },
-    { min: 7, message: "电话号码长度不能低于7个字符", trigger: "blur" },
-    { max: 32, message: "电话号码长度不能超过24个字符", trigger: "blur" },
-    {
-      pattern: PATTERN_PHONE,
-      message: "电话号码只能包含数字和短横线",
-      trigger: "blur",
-    },
-  ],
-  email: [
-    { required: false, message: "请输入邮箱", trigger: "blur" },
-    { max: 32, message: "邮箱长度不能超过56个字符", trigger: "blur" }
-  ],
-  address: [
-    { required: false, message: "请输入地址", trigger: "blur" },
-    { max: 256, message: "地址长度不能超过256个字符", trigger: "blur" }
-  ],
+  nickname: userBaseInfoFormCheckRule.nickname,
+  phone: userBaseInfoFormCheckRule.phone,
+  email: userBaseInfoFormCheckRule.email,
+  address: userBaseInfoFormCheckRule.address,
 }
 
 const userIsSysAdmin = (user) => user.role == Role.systemAdmin && user.username == "admin"

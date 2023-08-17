@@ -6,7 +6,7 @@
       <a-col :span="24">
         <a-page-header title="我的信息">
           <template #extra>
-            <a-button type="primary">更新信息</a-button>
+            <a-button type="primary" @click="openUpdateInfoDialog()">更新信息</a-button>
             <a-button type="primary" @click="openChangePasswordDialog()">修改密码</a-button>
           </template>
         </a-page-header>
@@ -32,7 +32,7 @@
 
     <a-row type="flex" justify="center">
       <a-col :span="24">
-        <a-modal width="50%" v-model:visible="changePasswordModalVisible" title="修改密码">
+        <a-modal width="50%" v-model:open="changePasswordModalVisible" title="修改密码">
           <a-form ref="changePasswordFormRef" :model="changePasswordInfo" :rules="changePasswordRules"
             :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }">
             <a-form-item label="旧密码" name="oldPassword">
@@ -54,13 +54,44 @@
       </a-col>
     </a-row>
 
+    <a-row type="flex" justify="center">
+      <a-col :span="24">
+        <a-modal width="50%" v-model:open="updateInfoVisible" title="更新信息">
+          <a-form ref="updateInfoFormRef" :model="infoDto" :rules="userBaseInfoFormCheckRule" :label-col="{ span: 4 }"
+            :wrapper-col="{ span: 24 }">
+
+            <a-form-item label="昵称" name="nickname">
+              <a-input v-model:value="infoDto.nickname" placeholder="请输入用户昵称" />
+            </a-form-item>
+
+            <a-form-item label="电话" name="phone">
+              <a-input v-model:value="infoDto.phone" placeholder="请输入用户电话" />
+            </a-form-item>
+
+            <a-form-item label="邮箱" name="email">
+              <a-input v-model:value="infoDto.email" placeholder="请输入用户邮箱" />
+            </a-form-item>
+
+            <a-form-item label="地址" name="address">
+              <a-input v-model:value="infoDto.address" placeholder="请输入用户地址" />
+            </a-form-item>
+
+          </a-form>
+
+          <template #footer>
+            <a-button key="submit" type="primary" @click="confirmUpdateInfo">确认</a-button>
+          </template>
+        </a-modal>
+      </a-col>
+    </a-row>
+
   </a-layout>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
 import { notification } from "ant-design-vue"
-
+import { userBaseInfoFormCheckRule } from "@/utils/bizConstants"
 import { UserService } from "@/services/userService"
 
 const userInfo = ref({})
@@ -124,4 +155,44 @@ const confirmChangePassword = () => {
 }
 
 getSelfInfo()
+
+// -----------------------------------------
+
+const updateInfoVisible = ref(false)
+const infoDto = reactive({
+  nickname: "",
+  phone: "",
+  email: "",
+  address: "",
+})
+
+const updateInfoFormRef = ref()
+
+const openUpdateInfoDialog = () => {
+  infoDto.nickname = userInfo.value.nickname
+  infoDto.phone = userInfo.value.phone
+  infoDto.email = userInfo.value.email
+  infoDto.address = userInfo.value.address
+  updateInfoVisible.value = true
+}
+
+const confirmUpdateInfo = () => {
+  updateInfoFormRef.value.validate().then(() => {
+
+    UserService.updateInfo(userInfo.value.id, infoDto).then((data) => {
+      userInfo.value.nickname = data.nickname
+      userInfo.value.phone = data.phone
+      userInfo.value.email = data.email
+      userInfo.value.address = data.address
+
+      notification.success({
+        message: "更新信息成功",
+        duration: 2,
+      })
+
+      updateInfoVisible.value = false
+    })
+
+  })
+}
 </script>

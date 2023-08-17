@@ -39,8 +39,13 @@ const updatePassword = async (oldPassword, newPassword) => {
   return await HttpClient.post(ApiPaths.userPasswordUpdate, { oldPassword: oldPassword, newPassword: newPassword })
 }
 
+const updateInfo = async (userId, infoDto) => {
+  const params = { userId: userId }
+  return await HttpClient.patch(ApiPaths.user, infoDto, { params: params })
+}
+
 const UserService = {
-  login, logout, createUser, listUsers, enableUser, disableUser, deleteUser, getSelfDetailInfo, updatePassword
+  login, logout, createUser, listUsers, enableUser, disableUser, deleteUser, getSelfDetailInfo, updatePassword, updateInfo
 }
 
 export { UserService }
