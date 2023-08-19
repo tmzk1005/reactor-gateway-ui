@@ -6,8 +6,10 @@
     <div class="api-create-container">
       <div class="api-create-left">
 
-        <api-plugin v-for="plugin in apiPlugins" :key="plugin.id" :draggable="plugin.draggable" v-show="!plugin.used"
-          @dragstart="dragStartZone1($event, plugin)" @dragend="dragEndZone1($event)" :data="plugin">
+        <!-- zone 1 -->
+        <api-plugin v-for="plugin in zone1Plugins" :data="plugin" :key="plugin.id" v-show="!plugin.used"
+          :draggable="plugin.draggable && (!plugin.tail || !zone2HasTail)" @dragstart="dragFromZone1ToZone2Start(plugin)"
+          @dragend="dragFromZone1ToZone2End($event)">
         </api-plugin>
 
       </div>
@@ -66,13 +68,15 @@
         <a-row style="padding-top: 20px;">
           <a-col :span="24">
             <a-page-header title="API处理流程" style="font-family: monospace; ">
-              <div class="configuration-container" @drop="dragDropZone2($event)" @dragenter="dragEnterZone2($event)"
-                @dragleave="dragLeaveZone2($event)" @dragover="dragOverZone2($event)">
+              <div class="configuration-container" @dragenter="zone2DragEnter($event)" @dragover="zone2DragOver($event)"
+                @dragleave="zone2DragLevel($event)" @drop="zone2DragDrop()">
 
-                <api-plugin-instance v-for="plItem in pluginChain" :key="plItem.id"
-                  :draggable="plItem.draggable && !plItem.tail" @dragstart="dragStartZone2($event, plItem)"
-                  @dragend="dragEndZone2($event)" :data="plItem"
-                  :style="{ 'pointer-events': plItem.preventEvents ? 'none' : 'all', border: plItem.temp ? 'dashed' : '' }">
+                <!-- zone 2 -->
+                <api-plugin-instance v-for="plugin in zone2Plugins" :data="plugin" :key="plugin.id"
+                  :style="{ border: plugin.temporary ? 'dashed' : '' }" :draggable="plugin.draggable && !plugin.tail"
+                  @dragstart="dragFromZone2ToZone2Start(plugin)" @dragend="dragFromZone2ToZone2End($event)"
+                  @dragenter="zone2PluginDragEnter($event, plugin)" @dragover="zone2PluginDragOver($event)"
+                  @dragleave="zone2PluginDragLeave($event)" @drop="zone2PluginDragDrop($event)">
                   <template #extra>
                     <a-button type="link" style="font-size: 1.1rem;">
                       <template #icon>
@@ -80,7 +84,7 @@
                       </template>
                       配置
                     </a-button>
-                    <a-button type="link" style="font-size: 1.1rem;" @click="removeFormPluginChain(plItem.id)">
+                    <a-button type="link" style="font-size: 1.1rem;" @click="removePluginInZone2(plugin)">
                       <template #icon>
                         <delete-outlined style="padding: 0; margin: 0;" />
                       </template>
@@ -105,31 +109,229 @@ import { DeleteOutlined, SettingOutlined } from '@ant-design/icons-vue'
 import { RoutePaths } from '@/utils/pathConstants'
 import ApiPlugin from "@/components/api/ApiPlugin.vue"
 import ApiPluginInstance from "@/components/api/ApiPluginInstance.vue"
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { PluginService } from '@/services/pluginService'
 
-const apiPlugins = ref([])
+// -------------------- 拖拽逻辑:初始状态 --------------------
+const zone1Plugins = ref([])
 
-const findPluginInApiPlugins = (pId) => {
-  for (var i = 0; i < apiPlugins.value.length; i++) {
-    if (apiPlugins.value[i].id == pId) {
-      return apiPlugins.value[i]
+const loadAllPlugins = () => {
+  PluginService.getAllPlugins().then((data) => {
+    zone1Plugins.value = data
+    for (var i = 0; i < zone1Plugins.value.length; i++) {
+      zone1Plugins.value[i].used = false
+      zone1Plugins.value[i].draggable = true
+    }
+  })
+}
+loadAllPlugins()
+
+// 维持拖拽逻辑实时状态的上下文对象
+const zone1 = 1
+const zone2 = 2
+const dragContext = {
+  srcZone: null,
+  draggingPlugin: null,
+  zone1EnterZone2Count: 0,
+}
+
+const zone2Plugins = ref([])
+const zone2HasTail = computed(() => zone2Plugins.value.length > 0 && zone2Plugins.value[zone2Plugins.value.length - 1].tail)
+
+// -------------------- 拖拽逻辑:工具方法 --------------------
+
+const createZone2PluginByZone1Plugin = (zone1Plugin) => {
+  return {
+    id: zone1Plugin.id,
+    name: zone1Plugin.name,
+    version: zone1Plugin.version,
+    description: zone1Plugin.description,
+    tail: zone1Plugin.tail,
+    draggable: false,
+    temporary: true,
+  }
+}
+
+const getPluginIndexInZoneById = (zone, id) => {
+  var arr
+  if (zone == zone1) {
+    arr = zone1Plugins.value
+  } else if (zone == zone2) {
+    arr = zone2Plugins.value
+  } else {
+    return -1
+  }
+  for (var i = 0; i < arr.length; ++i) {
+    if (arr[i].id == id) {
+      return i
     }
   }
-  return null
+  return -1
 }
 
-const setApiPluginUsed = (pId, used) => {
-  let item = findPluginInApiPlugins(pId)
-  if (item == null || item == undefined) {
-    return
+const removeFromZone2PluginsById = (id) => {
+  let index = getPluginIndexInZoneById(zone2, id)
+  zone2Plugins.value.splice(index, 1)
+}
+
+const swapPositionInZone2 = (pId1, pId2) => {
+  let index1 = getPluginIndexInZoneById(zone2, pId1)
+  let index2 = getPluginIndexInZoneById(zone2, pId2)
+  let tmp = zone2Plugins.value[index1]
+  zone2Plugins.value[index1] = zone2Plugins.value[index2]
+  zone2Plugins.value[index2] = tmp
+}
+
+// -------------------- 拖拽逻辑:从区域1拖到区域2 --------------------
+
+const dragFromZone1ToZone2Start = (plugin) => {
+  console.log("dragFromZone1ToZone2Start")
+  dragContext.srcZone = zone1
+  dragContext.draggingPlugin = plugin
+}
+
+const dragFromZone1ToZone2End = (event) => {
+  console.log("dragFromZone1ToZone2End")
+  event.preventDefault()
+  dragContext.srcZone = null
+  dragContext.draggingPlugin = null
+  dragContext.zone1EnterZone2Count = 0
+}
+
+// -------------------- 拖拽逻辑:从区域2拖到区域2 --------------------
+
+const dragFromZone2ToZone2Start = (plugin) => {
+  console.log("dragFromZone2ToZone2Start")
+  dragContext.srcZone = zone2
+  dragContext.draggingPlugin = plugin
+  dragContext.draggingPlugin.temporary = true
+}
+
+const dragFromZone2ToZone2End = (event) => {
+  console.log("dragFromZone2ToZone2End")
+  event.preventDefault()
+  dragContext.srcZone = null
+  dragContext.draggingPlugin.temporary = false
+  dragContext.draggingPlugin = null
+}
+
+const pushInZone2Plugins = (plugin) => {
+  let size = zone2Plugins.value.length
+  if (size == 0 || !zone2Plugins.value[size - 1].tail) {
+    zone2Plugins.value.push(plugin)
+    return true
+  } else if (!plugin.tail) {
+    zone2Plugins.value.splice(size - 1, 0, plugin)
+    return true
   }
-  item.used = used
-  return item
+  return false
 }
 
-const pluginChain = ref([])
+// -------------------- 拖拽逻辑:区域2 drop 相关逻辑 --------------------
 
+const zone2DragEnter = (event) => {
+  console.log("zone2DragEnter")
+  event.preventDefault()
+  if (dragContext.srcZone == null) {
+    return false
+  }
+
+  if (dragContext.srcZone == zone1) {
+    dragContext.zone1EnterZone2Count += 1
+    if (dragContext.zone1EnterZone2Count == 1) {
+      // 是第一次真的进入zone2
+      let zone2Plugin = createZone2PluginByZone1Plugin(dragContext.draggingPlugin)
+      if (pushInZone2Plugins(zone2Plugin)) {
+        dragContext.draggingPlugin.used = true
+      }
+    }
+  }
+}
+
+const zone2DragOver = (event) => {
+  // console.log("zone2DragOver")
+  event.preventDefault()
+}
+
+const zone2DragLevel = (event) => {
+  console.log("zone2DragLevel")
+  event.preventDefault()
+  if (dragContext.srcZone == null) {
+    return false
+  }
+
+  if (dragContext.srcZone == zone1) {
+    dragContext.zone1EnterZone2Count -= 1
+    if (dragContext.zone1EnterZone2Count == 0) {
+      // 真的离开了
+      removeFromZone2PluginsById(dragContext.draggingPlugin.id)
+      dragContext.draggingPlugin.used = false
+    }
+  }
+}
+
+const zone2DragDrop = () => {
+  console.log("zone2DragDrop")
+  if (dragContext.srcZone == null) {
+    return false
+  }
+  if (dragContext.srcZone == zone1) {
+    let index = getPluginIndexInZoneById(zone2, dragContext.draggingPlugin.id)
+    zone2Plugins.value[index].temporary = false
+    zone2Plugins.value[index].draggable = true
+  }
+}
+
+// -------------------- 拖拽逻辑:区域2内的子元素的拖拽逻辑 --------------------
+
+const noNeedHandle = (plugin) => {
+  if (dragContext.srcZone == null) {
+    return true
+  }
+  if (dragContext.draggingPlugin.tail || plugin.tail) {
+    return true
+  }
+  if (dragContext.draggingPlugin.id == plugin.id) {
+    return true
+  }
+  return false
+}
+
+const zone2PluginDragEnter = (event, plugin) => {
+  console.log(`zone2PluginDragEnter on ${plugin.name}`)
+  event.preventDefault()
+
+  if (noNeedHandle(plugin)) {
+    return false
+  }
+
+  swapPositionInZone2(dragContext.draggingPlugin.id, plugin.id)
+}
+
+const zone2PluginDragOver = (event) => {
+  event.preventDefault()
+}
+
+const zone2PluginDragLeave = (event) => {
+  event.preventDefault()
+}
+
+const zone2PluginDragDrop = (event) => {
+  event.preventDefault()
+}
+
+// -------------------- 区域2按钮事件 --------------------
+
+const removePluginInZone2 = (plugin) => {
+  let index2 = getPluginIndexInZoneById(zone2, plugin.id)
+  zone2Plugins.value.splice(index2, 1)
+
+  let index1 = getPluginIndexInZoneById(zone1, plugin.id)
+  zone1Plugins.value[index1].used = false
+}
+
+
+// -------------------- 提交新建API请求 --------------------
 const apiDto = reactive({
   name: "",
   path: "",
@@ -138,167 +340,7 @@ const apiDto = reactive({
   description: "",
 })
 
-const dragContext = {
-  pluginType: null,
-  pluginInstance: null,
-  enteredZone2: false,
-  pushedTempItem: false,
-  fromZone: null,
-}
 
-const setPointerEventsOfZone2Children = (boolValue) => {
-  for (var i = 0; i < pluginChain.value.length; ++i) {
-    pluginChain.value[i].preventEvents = boolValue
-    pluginChain.value[i].draggable = !boolValue && !pluginChain.value[i].tail
-  }
-}
-
-const dragStartZone1 = (_, item) => {
-  console.log('dragStartZone1')
-  dragContext.pluginType = item
-  dragContext.fromZone = '1'
-  setPointerEventsOfZone2Children(true)
-}
-
-const dragStartZone2 = (_, item) => {
-  console.log('dragStartZone2')
-  dragContext.pluginInstance = item
-  dragContext.fromZone = '2'
-  setPointerEventsOfZone2Children(true)
-}
-
-const _dragEnd = (evt) => {
-  evt.preventDefault()
-  dragContext.fromZone = null
-  dragContext.enteredZone2 = false
-  dragContext.pushedTempItem = false
-  dragContext.pluginInstance = null
-  setPointerEventsOfZone2Children(false)
-  let tailPluginDraggable = true
-  if (pluginChain.value.length != 0 && pluginChain.value[pluginChain.value.length - 1].tail) {
-    tailPluginDraggable = false
-  }
-  for (var i = 0; i < apiPlugins.value.length; i++) {
-    if (apiPlugins.value[i].tail) {
-      apiPlugins.value[i].draggable = tailPluginDraggable
-    } else {
-      apiPlugins.value[i].draggable = true
-    }
-  }
-}
-
-const dragEndZone1 = (evt) => {
-  console.log('dragEndZone1')
-  return _dragEnd(evt)
-}
-
-const dragEndZone2 = (evt) => {
-  console.log('dragEndZone2')
-  return _dragEnd(evt)
-}
-
-const dragEnterZone2 = (evt) => {
-  console.log('dragEnterZone2')
-  evt.preventDefault()
-
-  if (dragContext.fromZone == null) {
-    return false
-  }
-
-  if (dragContext.enteredZone2 || dragContext.pushedTempItem) {
-    return
-  }
-  dragContext.enteredZone2 = true
-  if (dragContext.fromZone == '1') {
-    console.log('enter from zone1 to zone2')
-    dragContext.pluginInstance = pluginInstanceFromType(dragContext.pluginType)
-    dragContext.pushedTempItem = true
-    if (dragContext.pluginInstance.tail || pluginChain.value.length == 0 || !pluginChain.value[pluginChain.value.length - 1].tail) {
-      pluginChain.value.push(dragContext.pluginInstance)
-    } else {
-      pluginChain.value.splice(pluginChain.value.length - 1, 0, dragContext.pluginInstance)
-    }
-  }
-}
-
-const dragLeaveZone2 = (evt) => {
-  console.log('dragLeaveZone2')
-  evt.preventDefault()
-
-  if (dragContext.fromZone == null) {
-    return false
-  }
-
-  dragContext.enteredZone2 = false
-  if (dragContext.pushedTempItem) {
-    dragContext.pushedTempItem = false
-    removeFormPluginChain(dragContext.pluginInstance.id)
-    dragContext.pluginInstance = null
-  }
-}
-
-const dragOverZone2 = (evt) => {
-  // console.log('dragOverZone2')
-  evt.preventDefault()
-
-  if (dragContext.fromZone == null) {
-    return false
-  }
-}
-
-const pluginInstanceFromType = (pluginType) => {
-  return {
-    id: pluginType.id,
-    name: pluginType.name,
-    nameDisplay: pluginType.nameDisplay,
-    version: pluginType.version,
-    description: pluginType.description,
-    tail: pluginType.tail,
-    draggable: false,
-    preventEvents: true,
-    temp: true,
-  }
-}
-
-const dragDropZone2 = (evt) => {
-  console.log("dragDropZone2")
-  console.log("to do", evt)
-
-  if (dragContext.fromZone == null) {
-    return false
-  }
-
-  if (dragContext.fromZone == '1') {
-    dragContext.pluginType.used = true
-    dragContext.pluginInstance.temp = false
-  }
-}
-
-const removeFormPluginChain = (pId) => {
-  for (var i = 0; i < pluginChain.value.length; i++) {
-    if (pluginChain.value[i].id == pId) {
-      pluginChain.value.splice(i, 1)
-      setApiPluginUsed(pId, false)
-      break
-    }
-  }
-  if (pluginChain.value.length == 0 || !pluginChain.value[pluginChain.value.length - 1].tail) {
-    for (var j = 0; i < apiPlugins.value.length; j++) {
-      apiPlugins.value[j].draggable = true
-    }
-  }
-}
-
-const loadAllPlugins = () => {
-  PluginService.getAllPlugins().then((data) => {
-    apiPlugins.value = data
-    for (var i = 0; i < apiPlugins.value.length; i++) {
-      apiPlugins.value[i].used = false
-      apiPlugins.value[i].draggable = true
-    }
-  })
-}
-loadAllPlugins()
 </script>
 
 <style scoped>
