@@ -78,7 +78,7 @@
                   @dragenter="zone2PluginDragEnter($event, plugin)" @dragover="zone2PluginDragOver($event)"
                   @dragleave="zone2PluginDragLeave($event)" @drop="zone2PluginDragDrop($event)">
                   <template #extra>
-                    <a-button type="link" style="font-size: 1.1rem;">
+                    <a-button type="link" style="font-size: 1.1rem;" @click="configPlugin(plugin)">
                       <template #icon>
                         <setting-outlined style="padding: 0; margin: 0;" />
                       </template>
@@ -101,6 +101,31 @@
       </div>
     </div>
 
+    <div>
+      <a-modal width="60%" v-model:open="configPluginDialogVisible">
+
+        <template #title>
+          <a-space style="align-items: flex-end;">
+            <span style="font-size: 1.5rem;">插件配置</span>
+            <span style="font-size: 1.3rem; color:cornflowerblue">{{ configPluginDialogTitle }}</span>
+          </a-space>
+        </template>
+
+        <template #footer>
+          <a-space style="float: left;">
+            <a-button key="doFormat" type="primary">校验</a-button>
+            <a-button key="doFormat" type="primary" @click="doFormat">格式化</a-button>
+          </a-space>
+          <a-button key="reset">重置</a-button>
+          <a-button key="saveEnvs" type="primary">保存</a-button>
+        </template>
+
+        <div class="editor-container">
+          <json-editor ref="editorRef" />
+        </div>
+      </a-modal>
+    </div>
+
   </a-layout>
 </template>
 
@@ -109,8 +134,9 @@ import { DeleteOutlined, SettingOutlined } from '@ant-design/icons-vue'
 import { RoutePaths } from '@/utils/pathConstants'
 import ApiPlugin from "@/components/api/ApiPlugin.vue"
 import ApiPluginInstance from "@/components/api/ApiPluginInstance.vue"
-import { computed, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref } from 'vue'
 import { PluginService } from '@/services/pluginService'
+import JsonEditor from '@/components/JsonEditor.vue'
 
 // -------------------- 拖拽逻辑:初始状态 --------------------
 const zone1Plugins = ref([])
@@ -322,6 +348,10 @@ const zone2PluginDragDrop = (event) => {
 
 // -------------------- 区域2按钮事件 --------------------
 
+const configPluginDialogVisible = ref(false)
+const configPluginDialogTitle = ref("")
+const editorRef = ref()
+
 const removePluginInZone2 = (plugin) => {
   let index2 = getPluginIndexInZoneById(zone2, plugin.id)
   zone2Plugins.value.splice(index2, 1)
@@ -330,6 +360,16 @@ const removePluginInZone2 = (plugin) => {
   zone1Plugins.value[index1].used = false
 }
 
+const configPlugin = (plugin) => {
+  configPluginDialogVisible.value = true
+  configPluginDialogTitle.value = plugin.name
+  nextTick(() => editorRef.value.setContent('{"name": "alice"}'))
+}
+
+const doFormat = () => {
+  let c = editorRef.value.getContent()
+  console.log(c)
+}
 
 // -------------------- 提交新建API请求 --------------------
 const apiDto = reactive({
@@ -339,7 +379,6 @@ const apiDto = reactive({
   tags: [],
   description: "",
 })
-
 
 </script>
 
@@ -378,5 +417,10 @@ const apiDto = reactive({
   background-color: #fdfdfd;
   box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
   transform: translateZ(10px);
+}
+
+.editor-container {
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
+  transform: translateZ(-10px);
 }
 </style>
