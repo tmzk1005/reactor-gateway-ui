@@ -18,15 +18,22 @@
         <a-row>
           <a-col :span="24">
             <a-page-header title="API基本信息" style="font-family: monospace;">
-              <a-form>
+
+              <template #extra>
+                <a-button key="submit" type="primary" :disabled="!readySubmitReq" @click="submitCreateApiReq">
+                  新建API
+                </a-button>
+              </template>
+
+              <a-form ref="apiDtoFormRef" :model="apiDto" :rules="apiDtoRules">
                 <a-row>
                   <a-col :span="8">
-                    <a-form-item label="名称" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }">
+                    <a-form-item label="名称" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }" name="name">
                       <a-input v-model:value="apiDto.name" placeholder="请输入API的名称" />
                     </a-form-item>
                   </a-col>
                   <a-col :span="8">
-                    <a-form-item label="路径" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }">
+                    <a-form-item label="路径" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }" name="path">
                       <a-input v-model:value="apiDto.path" placeholder="请输入HTTP请求路径" />
                     </a-form-item>
                   </a-col>
@@ -74,9 +81,10 @@
                 <!-- zone 2 -->
                 <api-plugin-instance v-for="plugin in zone2Plugins" :data="plugin" :key="plugin.id"
                   :style="{ border: plugin.temporary ? 'dashed' : '' }" :draggable="plugin.draggable && !plugin.tail"
-                  @dragstart="dragFromZone2ToZone2Start(plugin)" @dragend="dragFromZone2ToZone2End($event)"
-                  @dragenter="zone2PluginDragEnter($event, plugin)" @dragover="zone2PluginDragOver($event)"
-                  @dragleave="zone2PluginDragLeave($event)" @drop="zone2PluginDragDrop($event)">
+                  @dblclick="configPlugin(plugin)" @dragstart="dragFromZone2ToZone2Start(plugin)"
+                  @dragend="dragFromZone2ToZone2End($event)" @dragenter="zone2PluginDragEnter($event, plugin)"
+                  @dragover="zone2PluginDragOver($event)" @dragleave="zone2PluginDragLeave($event)"
+                  @drop="zone2PluginDragDrop($event)">
                   <template #extra>
                     <a-button type="link" style="font-size: 1.1rem;" @click="configPlugin(plugin)">
                       <template #icon>
@@ -135,8 +143,11 @@ import { RoutePaths } from '@/utils/pathConstants'
 import ApiPlugin from "@/components/api/ApiPlugin.vue"
 import ApiPluginInstance from "@/components/api/ApiPluginInstance.vue"
 import { computed, nextTick, reactive, ref } from 'vue'
+import { notification } from "ant-design-vue"
 import { PluginService } from '@/services/pluginService'
+import { ApiService } from '@/services/apiService'
 import JsonEditor from '@/components/JsonEditor.vue'
+import { PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
 
 // -------------------- 拖拽逻辑:初始状态 --------------------
 const zone1Plugins = ref([])
@@ -170,10 +181,11 @@ const createZone2PluginByZone1Plugin = (zone1Plugin) => {
   return {
     id: zone1Plugin.id,
     name: zone1Plugin.name,
+    fullClassName: zone1Plugin.fullClassName,
     version: zone1Plugin.version,
     description: zone1Plugin.description,
     jsonDefault: zone1Plugin.jsonDefault,
-    jsonConf: "",
+    jsonConf: zone1Plugin.jsonDefault,
     tail: zone1Plugin.tail,
     draggable: false,
     temporary: true,
@@ -409,6 +421,18 @@ const save = () => {
 
 // -------------------- 提交新建API请求 --------------------
 
+const readySubmitReq = computed(() => zone2Plugins.value.length != 0
+  && zone2Plugins.value[zone2Plugins.value.length - 1].tail
+  && apiDto.name
+  && apiDto.name != ""
+  && apiDto.path
+  && apiDto.path != ""
+  && apiDto.methods
+  && apiDto.methods.length > 0
+)
+
+const apiDtoFormRef = ref()
+
 const apiDto = reactive({
   name: "",
   path: "",
@@ -416,6 +440,76 @@ const apiDto = reactive({
   tags: [],
   description: "",
 })
+
+const apiDtoRules = {
+  name: [
+    { required: true, message: "请输入API名称", trigger: "blur" },
+    { min: 3, message: "API名称至少需要包含3个字符", trigger: "blur" },
+    { max: 32, message: "API名称长度不能超过32个字符", trigger: "blur" },
+    {
+      pattern: PATTERN_NORMAL_NAME_ZH,
+      message: "API名称只能包含字母,数字,下划线,以及中文",
+      trigger: "blur",
+    },
+  ],
+  path: [
+    { required: true, message: "请输入API请求路径", trigger: "blur" }
+  ],
+  methods: [
+    { type: 'array' },
+    { required: true, message: "请选择API支持的HTTP请求方法", trigger: ['change', 'blur'] }
+  ],
+  tags: [
+    { type: 'array', defaultField: { max: 20, message: "单个Tag长度不能超过20个字符", trigger: ['change', 'blur'] } },
+    {
+      validator: async (_, value) => {
+        if (value && value.length > 10) {
+          return Promise.reject("最多10个标签!")
+        }
+        return Promise.resolve()
+      }, trigger: 'change'
+    }
+  ],
+  description: [
+    { max: 512, message: "API描述长度不能超过512个字符", trigger: "blur" },
+  ]
+}
+
+const submitCreateApiReq = () => {
+  apiDtoFormRef.value.validate().then(() => {
+    if (zone2Plugins.value.length == 0) {
+      notification.error({ message: "未选择并配置API插件" })
+      return
+    } else if (!zone2Plugins.value[zone2Plugins.value.length - 1].tail) {
+      notification.error({ message: "最后一个插件必须是结尾类型插件" })
+      return
+    }
+
+    let finalApiDto = {
+      name: apiDto.name,
+      description: apiDto.description,
+      tags: apiDto.tags,
+      routeDefinition: {
+        path: apiDto.path,
+        methods: apiDto.methods,
+        pluginDefinitions: []
+      }
+    }
+
+    for (var i = 0; i < zone2Plugins.value.length; ++i) {
+      finalApiDto.routeDefinition.pluginDefinitions.push({
+        name: zone2Plugins.value[i].name,
+        fullClassName: zone2Plugins.value[i].fullClassName,
+        version: zone2Plugins.value[i].version,
+        jsonConf: zone2Plugins.value[i].jsonConf
+      })
+    }
+
+    ApiService.createApi(finalApiDto).then(() => {
+      notification.success({ message: "新建API成功" })
+    })
+  })
+}
 
 </script>
 
