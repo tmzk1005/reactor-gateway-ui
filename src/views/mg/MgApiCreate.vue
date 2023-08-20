@@ -211,13 +211,13 @@ const swapPositionInZone2 = (pId1, pId2) => {
 // -------------------- 拖拽逻辑:从区域1拖到区域2 --------------------
 
 const dragFromZone1ToZone2Start = (plugin) => {
-  console.log("dragFromZone1ToZone2Start")
+  // console.log("dragFromZone1ToZone2Start")
   dragContext.srcZone = zone1
   dragContext.draggingPlugin = plugin
 }
 
 const dragFromZone1ToZone2End = (event) => {
-  console.log("dragFromZone1ToZone2End")
+  // console.log("dragFromZone1ToZone2End")
   event.preventDefault()
   dragContext.srcZone = null
   dragContext.draggingPlugin = null
@@ -227,14 +227,14 @@ const dragFromZone1ToZone2End = (event) => {
 // -------------------- 拖拽逻辑:从区域2拖到区域2 --------------------
 
 const dragFromZone2ToZone2Start = (plugin) => {
-  console.log("dragFromZone2ToZone2Start")
+  // console.log("dragFromZone2ToZone2Start")
   dragContext.srcZone = zone2
   dragContext.draggingPlugin = plugin
   dragContext.draggingPlugin.temporary = true
 }
 
 const dragFromZone2ToZone2End = (event) => {
-  console.log("dragFromZone2ToZone2End")
+  // console.log("dragFromZone2ToZone2End")
   event.preventDefault()
   dragContext.srcZone = null
   dragContext.draggingPlugin.temporary = false
@@ -256,7 +256,7 @@ const pushInZone2Plugins = (plugin) => {
 // -------------------- 拖拽逻辑:区域2 drop 相关逻辑 --------------------
 
 const zone2DragEnter = (event) => {
-  console.log("zone2DragEnter")
+  // console.log("zone2DragEnter")
   event.preventDefault()
   if (dragContext.srcZone == null) {
     return false
@@ -280,7 +280,7 @@ const zone2DragOver = (event) => {
 }
 
 const zone2DragLevel = (event) => {
-  console.log("zone2DragLevel")
+  // console.log("zone2DragLevel")
   event.preventDefault()
   if (dragContext.srcZone == null) {
     return false
@@ -297,7 +297,7 @@ const zone2DragLevel = (event) => {
 }
 
 const zone2DragDrop = () => {
-  console.log("zone2DragDrop")
+  // console.log("zone2DragDrop")
   if (dragContext.srcZone == null) {
     return false
   }
@@ -324,7 +324,7 @@ const noNeedHandle = (plugin) => {
 }
 
 const zone2PluginDragEnter = (event, plugin) => {
-  console.log(`zone2PluginDragEnter on ${plugin.name}`)
+ //  console.log(`zone2PluginDragEnter on ${plugin.name}`)
   event.preventDefault()
 
   if (noNeedHandle(plugin)) {

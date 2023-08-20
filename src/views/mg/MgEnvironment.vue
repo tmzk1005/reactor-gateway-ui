@@ -251,7 +251,7 @@ const saveEditedVar = () => {
 
 const deleteVar = (record, index) => {
   if (record.isNew) {
-    console.log('remove new')
+    // console.log('remove new')
     oneOrgEnvVars.value.splice(index, 1)
     return
   }
