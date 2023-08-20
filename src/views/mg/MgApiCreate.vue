@@ -102,7 +102,7 @@
     </div>
 
     <div>
-      <a-modal width="60%" v-model:open="configPluginDialogVisible">
+      <a-modal width="60%" v-model:open="configPluginDialogVisible" @cancel="save">
 
         <template #title>
           <a-space style="align-items: flex-end;">
@@ -113,11 +113,11 @@
 
         <template #footer>
           <a-space style="float: left;">
-            <a-button key="doFormat" type="primary">校验</a-button>
+            <a-button key="doFormat" type="primary" @click="validate">校验</a-button>
             <a-button key="doFormat" type="primary" @click="doFormat">格式化</a-button>
           </a-space>
-          <a-button key="reset">重置</a-button>
-          <a-button key="saveEnvs" type="primary">保存</a-button>
+          <a-button key="reset" @click="reset">重置</a-button>
+          <a-button key="saveEnvs" type="primary" @click="save">保存</a-button>
         </template>
 
         <div class="editor-container">
@@ -172,6 +172,8 @@ const createZone2PluginByZone1Plugin = (zone1Plugin) => {
     name: zone1Plugin.name,
     version: zone1Plugin.version,
     description: zone1Plugin.description,
+    jsonDefault: zone1Plugin.jsonDefault,
+    jsonConf: "",
     tail: zone1Plugin.tail,
     draggable: false,
     temporary: true,
@@ -324,7 +326,7 @@ const noNeedHandle = (plugin) => {
 }
 
 const zone2PluginDragEnter = (event, plugin) => {
- //  console.log(`zone2PluginDragEnter on ${plugin.name}`)
+  //  console.log(`zone2PluginDragEnter on ${plugin.name}`)
   event.preventDefault()
 
   if (noNeedHandle(plugin)) {
@@ -346,11 +348,7 @@ const zone2PluginDragDrop = (event) => {
   event.preventDefault()
 }
 
-// -------------------- 区域2按钮事件 --------------------
-
-const configPluginDialogVisible = ref(false)
-const configPluginDialogTitle = ref("")
-const editorRef = ref()
+// -------------------- 区域2删除插件事件 --------------------
 
 const removePluginInZone2 = (plugin) => {
   let index2 = getPluginIndexInZoneById(zone2, plugin.id)
@@ -360,18 +358,57 @@ const removePluginInZone2 = (plugin) => {
   zone1Plugins.value[index1].used = false
 }
 
+// -------------------- 插件JSON配置相关逻辑 --------------------
+
+const editorRef = ref()
+const configPluginDialogVisible = ref(false)
+const configPluginDialogTitle = ref("")
+let lastPlugin = null
+
 const configPlugin = (plugin) => {
   configPluginDialogVisible.value = true
   configPluginDialogTitle.value = plugin.name
-  nextTick(() => editorRef.value.setContent('{"name": "alice"}'))
+  nextTick(() => {
+    if (lastPlugin) {
+      let content = editorRef.value.getContent()
+      lastPlugin.jsonConf = content
+    }
+    lastPlugin = plugin
+    if (!plugin.jsonConf || plugin.jsonConf == "") {
+      plugin.jsonConf = plugin.jsonDefault
+    }
+    editorRef.value.setContent(plugin.jsonConf)
+  })
 }
 
 const doFormat = () => {
-  let c = editorRef.value.getContent()
-  console.log(c)
+  let content = editorRef.value.getContent()
+  try {
+    content = JSON.stringify(JSON.parse(content), null, 4)
+  } catch {
+    // do nothing
+    return
+  }
+  lastPlugin.jsonConf = content
+  editorRef.value.setContent(content)
+}
+
+const validate = () => {
+  // TODO : 发送配置给后端，让后端使用jsonschema校验配置是否匹配schema
+}
+
+const reset = () => {
+  lastPlugin.jsonConf = lastPlugin.jsonDefault
+  editorRef.value.setContent(lastPlugin.jsonConf)
+}
+
+const save = () => {
+  let content = editorRef.value.getContent()
+  lastPlugin.jsonConf = content
 }
 
 // -------------------- 提交新建API请求 --------------------
+
 const apiDto = reactive({
   name: "",
   path: "",
