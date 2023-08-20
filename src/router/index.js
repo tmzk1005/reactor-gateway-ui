@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import { RoutePaths } from '@/utils/pathConstants'
+import { RouteNames, RoutePaths } from '@/utils/pathConstants'
 import { useModeStore } from '@/stores/mode'
 import { useSessionStore } from '@/stores/session'
 
@@ -32,6 +32,12 @@ const apiManagementRoutes = {
     {
       path: RoutePaths.mgApiCreate,
       component: () => import("@/views/mg/MgApiCreate.vue")
+    },
+    {
+      path: RoutePaths.mgApiDetail,
+      name: RouteNames.mgApiDetail,
+      props: true,
+      component: () => import("@/views/mg/MgApiDetail.vue")
     },
     {
       path: RoutePaths.mgAccessLog,

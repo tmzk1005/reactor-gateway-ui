@@ -20,7 +20,7 @@
           <template v-slot:bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'name'">
               <span>
-                <a-button style="padding-left: 0;" type="link">
+                <a-button style="padding-left: 0;" type="link" @click="goToApiDetailPage(record.id)">
                   {{ record.name }}
                 </a-button>
               </span>
@@ -60,7 +60,7 @@ import { DefaultPaginationConf } from "@/utils/bizConstants"
 import { colorForHttpMethod } from "@/utils/bizConstants"
 import { useSessionStore } from "@/stores/session"
 import { useRouter } from "vue-router"
-import { RoutePaths } from '@/utils/pathConstants'
+import { RouteNames, RoutePaths } from '@/utils/pathConstants'
 
 const sessionStore = useSessionStore()
 const router = useRouter()
@@ -106,6 +106,13 @@ const listApis = (pageNum, pageSize) => {
 
 const tableChanged = (changedPaginationConf) => {
   listApis(changedPaginationConf.current, changedPaginationConf.pageSize)
+}
+
+const goToApiDetailPage = (apiId) => {
+  router.push({
+    name: RouteNames.mgApiDetail,
+    params: { apiId: apiId }
+  })
 }
 
 listApis(paginationConf.current, paginationConf.pageSize)

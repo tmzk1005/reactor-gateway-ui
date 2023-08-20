@@ -7,11 +7,15 @@ const createApi = async (apiDto) => {
 
 const listApis = async (pageNum, pageSize) => {
   const params = { pageNum: pageNum, pageSize: pageSize }
-  return await HttpClient.get(ApiPaths.api, {params : params})
+  return await HttpClient.get(ApiPaths.api, { params: params })
+}
+
+const getApiById = async (apiId) => {
+  return await HttpClient.get(ApiPaths.apiById(apiId))
 }
 
 const ApiService = {
-  createApi, listApis
+  createApi, listApis, getApiById
 }
 
 export { ApiService }

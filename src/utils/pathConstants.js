@@ -7,6 +7,7 @@ const RoutePaths = {
     mgUser: "/mg/user",
     mgApi: "/mg/api",
     mgApiCreate: "/mg/api/create",
+    mgApiDetail: "/mg/api/detail/:apiId",
     mgAccessLog: "/mg/access-log",
     mgApiSubscription: "/mg/api-subscription",
     mgMyInfo: "/mg/my-info",
@@ -30,7 +31,12 @@ const ApiPaths = {
     userDisable: (userId) => `/user/_disable/${userId}`,
     userDelete: (userId) => `/user/_delete/${userId}`,
     api: "/api",
+    apiById: (apiId) => `/api/${apiId}`,
     plugin: "/plugin",
 }
 
-export { RoutePaths, ApiPaths }
+const RouteNames = {
+    mgApiDetail: 'mgApiDetail'
+}
+
+export { RoutePaths, ApiPaths, RouteNames }
