@@ -14,8 +14,18 @@ const getApiById = async (apiId) => {
   return await HttpClient.get(ApiPaths.apiById(apiId))
 }
 
+const publishApi = async (apiId, envId) => {
+  const params = { envId: envId }
+  return await HttpClient.post(ApiPaths.apiPublish(apiId), null, { params: params })
+}
+
+const unpublishApi = async (apiId, envId) => {
+  const params = { envId: envId }
+  return await HttpClient.post(ApiPaths.apiUnpublish(apiId), null, { params: params })
+}
+
 const ApiService = {
-  createApi, listApis, getApiById
+  createApi, listApis, getApiById, publishApi, unpublishApi
 }
 
 export { ApiService }

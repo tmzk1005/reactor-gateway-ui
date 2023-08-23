@@ -32,6 +32,8 @@ const ApiPaths = {
     userDelete: (userId) => `/user/_delete/${userId}`,
     api: "/api",
     apiById: (apiId) => `/api/${apiId}`,
+    apiPublish: (apiId) => `/api/_publish/${apiId}`,
+    apiUnpublish: (apiId) => `/api/_unpublish/${apiId}`,
     plugin: "/plugin",
 }
 

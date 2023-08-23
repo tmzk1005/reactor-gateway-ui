@@ -55,7 +55,7 @@
       <a-col :span="24">
         <a-page-header class="section-container" title="各环境发布快照">
 
-          <a-tabs type="card" @change="tabChanged">
+          <a-tabs type="card" @change="tabChanged" v-model:activeKey="activeTabIndex">
             <a-tab-pane v-for="snapshot in snapshots" :key="snapshot.index">
 
               <template #tab>
@@ -70,45 +70,7 @@
                 </span>
               </template>
 
-              <a-row type="flex" justify="center" v-if="snapshot.env != null">
-                <a-col :span="24">
-                  <a-page-header class="section-container">
-
-                    <template #title>
-                      <span class="section-level-2"> {{ snapshot.env.name }}</span>
-                    </template>
-
-                    <a-descriptions bordered :column="2" :label-style="labelStyle">
-                      <a-descriptions-item label="发布状态">
-                        <a-tag :color="colorPublishStatus(snapshot.publishStatus)">
-                          {{ snapshot.publishStatusDisplay }}
-                        </a-tag>
-                      </a-descriptions-item>
-
-                      <a-descriptions-item label="环境">
-                        <span>
-                          {{ snapshot.env.name }}
-                        </span>
-                      </a-descriptions-item>
-
-                      <a-descriptions-item label="发布者">
-                        <span>
-                          {{ snapshot.publisherName }}
-                        </span>
-                      </a-descriptions-item>
-
-                      <a-descriptions-item label="发布时间">
-                        <span>
-                          {{ snapshot.lastModifiedDate }}
-                        </span>
-                      </a-descriptions-item>
-                    </a-descriptions>
-
-                  </a-page-header>
-                </a-col>
-              </a-row>
-
-              <a-row type="flex" justify="center" v-else>
+              <a-row type="flex" justify="center" v-if="snapshot.index == 0">
                 <a-col :span="24">
                   <a-page-header class="section-container">
 
@@ -128,7 +90,65 @@
                 </a-col>
               </a-row>
 
-              <a-row type="flex" justify="center">
+              <a-row type="flex" justify="center" v-else>
+                <a-col :span="24">
+                  <a-page-header class="section-container">
+
+                    <template #title>
+                      <span class="section-level-2"> {{ snapshot.env.name }}</span>
+                    </template>
+
+                    <template #extra>
+
+                      <a-popconfirm :title="`确认从${snapshot.env.name}下线API吗?`" ok-text="确认" cancel-text="取消"
+                        v-if="snapshot.publishStatus != 'UNPUBLISHED'" @confirm="unpublishApi(api.id, snapshot.env.id)">
+                        <a-button type="primary" danger :icon="h(DownloadOutlined)">{{ `下线[${snapshot.env.name}]` }}</a-button>
+                      </a-popconfirm>
+
+                      <a-popconfirm :title="`确认发布API到${snapshot.env.name}吗?`" ok-text="确认" cancel-text="取消"
+                        v-if="snapshot.publishStatus == 'UNPUBLISHED'" @confirm="publishApi(api.id, snapshot.env.id)">
+                        <a-button type="primary" :icon="h(UploadOutlined)">{{ `发布[${snapshot.env.name}]` }}</a-button>
+                      </a-popconfirm>
+
+                      <a-popconfirm :title="`确认发布修改后的API到${snapshot.env.name}吗?`" ok-text="确认" cancel-text="取消"
+                        v-if="snapshot.publishStatus == 'NOT_UPDATED'" @confirm="publishApi(api.id, snapshot.env.id)">
+                        <a-button type="primary" :icon="h(UploadOutlined)">{{ `更新[${snapshot.env.name}]` }}</a-button>
+                      </a-popconfirm>
+
+                    </template>
+
+                    <a-descriptions bordered :column="2" :label-style="labelStyle">
+                      <a-descriptions-item label="发布状态">
+                        <a-tag :color="colorPublishStatus(snapshot.publishStatus)">
+                          {{ snapshot.publishStatusDisplay }}
+                        </a-tag>
+                      </a-descriptions-item>
+
+                      <a-descriptions-item label="环境">
+                        <span>
+                          {{ snapshot.env.name }}
+                        </span>
+                      </a-descriptions-item>
+
+                      <a-descriptions-item label="发布者" v-if="snapshot.publishStatus != 'UNPUBLISHED'">
+                        <span>
+                          {{ snapshot.publisherName }}
+                        </span>
+                      </a-descriptions-item>
+
+                      <a-descriptions-item label="发布时间" v-if="snapshot.publishStatus != 'UNPUBLISHED'">
+                        <span>
+                          {{ snapshot.lastModifiedDate }}
+                        </span>
+                      </a-descriptions-item>
+                    </a-descriptions>
+
+                  </a-page-header>
+                </a-col>
+              </a-row>
+
+              <a-row type="flex" justify="center"
+                v-if="snapshot.publishStatus == 'PUBLISHED' || snapshot.publishStatus == 'NOT_UPDATED'">
                 <a-col :span="24">
                   <a-page-header class="section-container">
 
@@ -154,7 +174,8 @@
                 </a-col>
               </a-row>
 
-              <a-row type="flex" justify="center">
+              <a-row type="flex" justify="center"
+                v-if="snapshot.publishStatus != 'UNPUBLISHED' && snapshot.routeDefinition != null">
                 <a-col :span="24">
                   <a-page-header class="section-container">
 
@@ -207,11 +228,13 @@
 </template>
 
 <script setup>
-import { nextTick, ref } from 'vue'
+import { nextTick, ref, h } from 'vue'
 import { RoutePaths } from '@/utils/pathConstants'
 import { ApiService } from "@/services/apiService"
 import { colorForHttpMethod } from "@/utils/bizConstants"
 import { newInstance, StraightConnector, BlankEndpoint } from "@jsplumb/browser-ui"
+import { DownloadOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { notification } from "ant-design-vue"
 
 const props = defineProps({
   apiId: String
@@ -226,7 +249,7 @@ const colorPublishStatus = (publishStatus) => {
   } else if (publishStatus == "NOT_UPDATED") {
     return 'orange'
   } else {
-    return null
+    return 'red'
   }
 }
 
@@ -252,13 +275,15 @@ const getApi = (id) => {
       arr.push(ps)
     }
     snapshots.value = arr
-    tabChanged(0)
+    tabChanged(activeTabIndex.value)
   })
 }
 
 getApi(props.apiId)
 
-const jsplumbStatus = {}
+const activeTabIndex = ref(0)
+let jsplumbStatus = {}
+let jsplumbContainers = []
 
 const tabChanged = (key) => {
   // console.log(`tab changed to ${key}`)
@@ -266,11 +291,13 @@ const tabChanged = (key) => {
     // console.log(`Skip jsplumb arrow drawing for ${key}`)
     return
   }
+  if (!snapshots.value[key].routeDefinition) {
+    return
+  }
   jsplumbStatus[key] = true
 
   nextTick(() => {
     let container = newInstance({ container: document.getElementById(`jsplumb-container-${key}`) })
-
     for (var i = 0; i < snapshots.value[key].routeDefinition.pluginDefinitions.length - 1; ++i) {
       container.connect(
         {
@@ -285,6 +312,30 @@ const tabChanged = (key) => {
         }
       )
     }
+  })
+}
+
+const apiInfoMayUpdated = () => {
+  if (jsplumbContainers) {
+    for (var i = 0; i < jsplumbContainers.length; ++i) {
+      jsplumbContainers[i].reset()
+    }
+  }
+  jsplumbStatus = {}
+  getApi(props.apiId)
+}
+
+const publishApi = (apiId, envId) => {
+  ApiService.publishApi(apiId, envId).then(() => {
+    notification.success({ message: "发布API成功" })
+    apiInfoMayUpdated()
+  })
+}
+
+const unpublishApi = (apiId, envId) => {
+  ApiService.unpublishApi(apiId, envId).then(() => {
+    notification.success({ message: "下线API成功" })
+    apiInfoMayUpdated()
   })
 }
 
