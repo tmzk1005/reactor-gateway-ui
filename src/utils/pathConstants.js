@@ -33,10 +33,13 @@ const ApiPaths = {
     userEnable: (userId) => `/user/_enable/${userId}`,
     userDisable: (userId) => `/user/_disable/${userId}`,
     userDelete: (userId) => `/user/_delete/${userId}`,
+
     api: "/api",
     apiById: (apiId) => `/api/${apiId}`,
     apiPublish: (apiId) => `/api/_publish/${apiId}`,
     apiUnpublish: (apiId) => `/api/_unpublish/${apiId}`,
+    apiReleased: (envId) => `/api/released/${envId}`,
+
     plugin: "/plugin",
 
     app: "/app",

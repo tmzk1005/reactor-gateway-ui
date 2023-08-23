@@ -24,8 +24,13 @@ const unpublishApi = async (apiId, envId) => {
   return await HttpClient.post(ApiPaths.apiUnpublish(apiId), null, { params: params })
 }
 
+const searchReleasedApi = async (envId, searchText, pageNum, pageSize) => {
+  const params = { pageNum: pageNum, pageSize: pageSize, searchText: searchText }
+  return await HttpClient.get(ApiPaths.apiReleased(envId), { params: params })
+}
+
 const ApiService = {
-  createApi, listApis, getApiById, publishApi, unpublishApi
+  createApi, listApis, getApiById, publishApi, unpublishApi, searchReleasedApi
 }
 
 export { ApiService }
