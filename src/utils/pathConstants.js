@@ -14,6 +14,9 @@ const RoutePaths = {
     mgPlugin: "/mg/plugin",
 
     mkIndex: "/mk",
+    mkApi: "/mk/api",
+    mkUserApp: "/mk/app",
+    mkUserApply: "/mk/apply",
     mkLogin: "/mk/login",
     mkMyInfo: "/mk/my-info",
 }

@@ -61,8 +61,20 @@ const apiManagementRoutes = {
 const apiMarketRoutes = {
   path: RoutePaths.mkIndex,
   component: () => import("@/views/mk/MkIndex.vue"),
-  redirect: RoutePaths.mkMyInfo,
+  redirect: RoutePaths.mkApi,
   children: [
+    {
+      path: RoutePaths.mkApi,
+      component: () => import("@/views/mk/ApiMarket.vue")
+    },
+    {
+      path: RoutePaths.mkUserApp,
+      component: () => import("@/views/mk/UserApp.vue")
+    },
+    {
+      path: RoutePaths.mkUserApply,
+      component: () => import("@/views/mk/UserApply.vue")
+    },
     {
       path: RoutePaths.mkMyInfo,
       component: () => import("@/views/common/MyInfo.vue")

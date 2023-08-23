@@ -1,16 +1,16 @@
 <template>
   <a-menu theme="light" mode="inline">
-    <a-menu-item key="apiMarket">
+    <a-menu-item key="apiMarket" @click="goToPage(RoutePaths.mkApi)">
       <area-chart-outlined />
       <span><code>API</code>市场</span>
     </a-menu-item>
 
-    <a-menu-item key="app">
+    <a-menu-item key="app" @click="goToPage(RoutePaths.mkUserApp)">
       <appstore-outlined />
       <span>我的应用</span>
     </a-menu-item>
 
-    <a-menu-item key="apiApply">
+    <a-menu-item key="apiApply" @click="goToPage(RoutePaths.mkUserApply)">
       <delivered-procedure-outlined />
       <span>我的申请</span>
     </a-menu-item>
@@ -24,4 +24,12 @@
 
 <script setup>
 import { AreaChartOutlined, AppstoreOutlined, UserOutlined, DeliveredProcedureOutlined } from '@ant-design/icons-vue'
+import { RoutePaths } from "@/utils/pathConstants"
+import { useRouter } from "vue-router"
+
+const router = useRouter()
+
+const goToPage = (dstPath) => {
+  router.push(dstPath)
+}
 </script>
