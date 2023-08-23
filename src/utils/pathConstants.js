@@ -38,6 +38,8 @@ const ApiPaths = {
     apiPublish: (apiId) => `/api/_publish/${apiId}`,
     apiUnpublish: (apiId) => `/api/_unpublish/${apiId}`,
     plugin: "/plugin",
+
+    app: "/app",
 }
 
 const RouteNames = {
