@@ -12,6 +12,7 @@
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
     "@highlightjs/vue-plugin": "^2.1.0",
+    "@jsplumb/browser-ui": "^6.2.10",
     "ace-builds": "^1.24.1",
     "ant-design-vue": "^4.0.0",
     "axios": "^1.4.0",
