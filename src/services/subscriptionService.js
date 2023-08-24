@@ -19,8 +19,18 @@ const listHistory = async (pageNum, pageSize) => {
   return _doListHistory(pageNum, pageSize, false)
 }
 
+const approve = async (subId) => {
+  const params = { subscribeId: subId }
+  return HttpClient.post(ApiPaths.subscriptionApprove(subId), null, { params: params })
+}
+
+const reject = async (subId) => {
+  const params = { subscribeId: subId }
+  return HttpClient.post(ApiPaths.subscriptionReject(subId), null, { params: params })
+}
+
 const SubscriptionService = {
-  subscribe, listHistoryAsSubscriber, listHistory
+  subscribe, listHistoryAsSubscriber, listHistory, approve, reject
 }
 
 export { SubscriptionService }

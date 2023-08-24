@@ -71,7 +71,7 @@ const ApplyStates = {
     color: 'blue',
     display: '审核中'
   },
-  PREMITTED: {
+  PERMITTED: {
     color: 'green',
     display: '已通过'
   },

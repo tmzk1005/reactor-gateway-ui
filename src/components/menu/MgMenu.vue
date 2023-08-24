@@ -10,24 +10,26 @@
         <api-outlined />
         <span><code>API管理</code></span>
       </template>
+
       <a-menu-item key="api" @click="goToPage(RoutePaths.mgApi)">
         <api-outlined />
         <span><code>API查看</code></span>
       </a-menu-item>
+
       <a-menu-item key="apiCreate" @click="goToPage(RoutePaths.mgApiCreate)" v-if="sessionStore.isNormalUser">
         <plus-circle-outlined />
         <span><code>新建API</code></span>
+      </a-menu-item>
+
+      <a-menu-item key="apiSubscription" @click="goToPage(RoutePaths.mgApiSubscription)">
+        <delivered-procedure-outlined />
+        <span>订阅申请</span>
       </a-menu-item>
     </a-sub-menu>
 
     <a-menu-item key="accessLog" @click="goToPage(RoutePaths.mgAccessLog)">
       <snippets-outlined />
       <span>访问日志</span>
-    </a-menu-item>
-
-    <a-menu-item key="apiSubscription" @click="goToPage(RoutePaths.mgApiSubscription)">
-      <delivered-procedure-outlined />
-      <span><code>API</code>订阅申请</span>
     </a-menu-item>
 
     <a-menu-item key="environment" @click="goToPage(RoutePaths.mgEnvironment)">
@@ -45,7 +47,8 @@
       <span>我的信息</span>
     </a-menu-item>
 
-    <a-menu-item key="user" v-if="sessionStore.isSystemAdmin || sessionStore.isOrgAdmin" @click="goToPage(RoutePaths.mgUser)">
+    <a-menu-item key="user" v-if="sessionStore.isSystemAdmin || sessionStore.isOrgAdmin"
+      @click="goToPage(RoutePaths.mgUser)">
       <team-outlined />
       <span>用户管理</span>
     </a-menu-item>

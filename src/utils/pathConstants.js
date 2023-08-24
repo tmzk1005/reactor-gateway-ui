@@ -46,6 +46,8 @@ const ApiPaths = {
 
     subscription: "/subscription",
     subscriptionSub: "/subscription/_subscribe",
+    subscriptionApprove: (subId) => `/subscription/${subId}/_approve`,
+    subscriptionReject: (subId) => `/subscription/${subId}/_reject`,
 }
 
 const RouteNames = {
