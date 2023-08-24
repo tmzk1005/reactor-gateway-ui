@@ -100,7 +100,7 @@
 
   <a-row>
     <a-col :span="24">
-      <a-modal width="50%" v-model:visible="applyDialogVisible" title="申请访问API">
+      <a-modal width="50%" v-model:open="applyDialogVisible" title="申请访问API">
 
         <a-descriptions :bordered="true" :column="1" :labelStyle="{ width: '180px' }">
           <a-descriptions-item label="API名称">{{ applyApiName }}</a-descriptions-item>
@@ -185,7 +185,7 @@ const choosedApp = reactive({
   "id": null
 })
 let applyApiId = null
-let applyApiName = reactive("")
+let applyApiName = ref("")
 
 const fetchApps = (pageNum, pageSize) => {
   AppService.listApps(pageNum, pageSize).then((pageData) => {
@@ -198,7 +198,7 @@ const fetchApps = (pageNum, pageSize) => {
 
 const applyApi = (releasedApi) => {
   applyApiId = releasedApi.id
-  applyApiName = releasedApi.name
+  applyApiName.value = releasedApi.name
 
   if (appSelectOptions.value.length == 0) {
     fetchApps(1, 200)
@@ -211,7 +211,7 @@ const confirmApplyApi = () => {
     notification.success({ "message": "提交API访问申请成功，请等待API所有者审核!" })
     applyDialogVisible.value = false
     applyApiId = null
-    applyApiName = ""
+    applyApiName.value = ""
   })
 }
 </script>

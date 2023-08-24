@@ -74,6 +74,7 @@ import { useSessionStore } from "@/stores/session"
 import { PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
 import { reactive, ref } from "vue"
 import { notification } from "ant-design-vue"
+import { ExclamationCircleOutlined, DeleteOutlined } from "@ant-design/icons-vue"
 import { AppService } from "@/services/appService"
 import { DefaultPaginationConf } from "@/utils/bizConstants"
 
