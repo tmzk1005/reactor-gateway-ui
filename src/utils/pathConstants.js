@@ -43,6 +43,9 @@ const ApiPaths = {
     plugin: "/plugin",
 
     app: "/app",
+
+    subscription: "/subscription",
+    subscriptionSub: "/subscription/_subscribe",
 }
 
 const RouteNames = {
