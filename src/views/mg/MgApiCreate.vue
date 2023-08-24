@@ -139,7 +139,7 @@
 
 <script setup>
 import { DeleteOutlined, SettingOutlined } from '@ant-design/icons-vue'
-import { RoutePaths } from '@/utils/pathConstants'
+import { RoutePaths, RouteNames } from '@/utils/pathConstants'
 import ApiPlugin from "@/components/api/ApiPlugin.vue"
 import ApiPluginInstance from "@/components/api/ApiPluginInstance.vue"
 import { computed, nextTick, reactive, ref } from 'vue'
@@ -148,6 +148,9 @@ import { PluginService } from '@/services/pluginService'
 import { ApiService } from '@/services/apiService'
 import JsonEditor from '@/components/JsonEditor.vue'
 import { PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
+import { useRouter } from "vue-router"
+
+const router = useRouter()
 
 // -------------------- 拖拽逻辑:初始状态 --------------------
 const zone1Plugins = ref([])
@@ -505,8 +508,12 @@ const submitCreateApiReq = () => {
       })
     }
 
-    ApiService.createApi(finalApiDto).then(() => {
+    ApiService.createApi(finalApiDto).then((data) => {
       notification.success({ message: "新建API成功" })
+      router.push({
+        name: RouteNames.mgApiDetail,
+        params: { apiId: data.id }
+      })
     })
   })
 }
