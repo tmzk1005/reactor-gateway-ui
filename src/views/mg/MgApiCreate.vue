@@ -184,6 +184,7 @@ const createZone2PluginByZone1Plugin = (zone1Plugin) => {
   return {
     id: zone1Plugin.id,
     name: zone1Plugin.name,
+    builtin: zone1Plugin.builtin,
     fullClassName: zone1Plugin.fullClassName,
     version: zone1Plugin.version,
     description: zone1Plugin.description,
@@ -502,6 +503,7 @@ const submitCreateApiReq = () => {
     for (var i = 0; i < zone2Plugins.value.length; ++i) {
       finalApiDto.routeDefinition.pluginDefinitions.push({
         name: zone2Plugins.value[i].name,
+        builtin: zone2Plugins.value[i].builtin,
         fullClassName: zone2Plugins.value[i].fullClassName,
         version: zone2Plugins.value[i].version,
         jsonConf: zone2Plugins.value[i].jsonConf
