@@ -55,6 +55,10 @@ const apiManagementRoutes = {
       path: RoutePaths.mgPlugin,
       component: () => import("@/views/mg/MgPlugin.vue")
     },
+    {
+      path: RoutePaths.mgGateway,
+      component: () => import("@/views/mg/GatewayNode.vue")
+    },
   ]
 }
 

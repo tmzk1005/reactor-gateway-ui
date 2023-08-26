@@ -58,7 +58,7 @@
       <span>组织管理</span>
     </a-menu-item>
 
-    <a-menu-item key="gatewayNode" v-if="sessionStore.isSystemAdmin">
+    <a-menu-item key="gatewayNode" v-if="sessionStore.isSystemAdmin" @click="goToPage(RoutePaths.mgGateway)">
       <cluster-outlined />
       <span>网关节点</span>
     </a-menu-item>

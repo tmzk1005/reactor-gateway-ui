@@ -13,6 +13,8 @@ const RoutePaths = {
     mgMyInfo: "/mg/my-info",
     mgPlugin: "/mg/plugin",
 
+    mgGateway: "/mg/gateway",
+
     mkIndex: "/mk",
     mkApi: "/mk/api",
     mkUserApp: "/mk/app",
@@ -48,6 +50,8 @@ const ApiPaths = {
     subscriptionSub: "/subscription/_subscribe",
     subscriptionApprove: (subId) => `/subscription/${subId}/_approve`,
     subscriptionReject: (subId) => `/subscription/${subId}/_reject`,
+
+    gatewayNodes: "/gateway/nodes",
 }
 
 const RouteNames = {
