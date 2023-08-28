@@ -52,6 +52,8 @@ const ApiPaths = {
     subscriptionReject: (subId) => `/subscription/${subId}/_reject`,
 
     gatewayNodes: "/gateway/nodes",
+
+    accessLog: "/access-log",
 }
 
 const RouteNames = {
