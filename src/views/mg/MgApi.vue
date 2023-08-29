@@ -13,6 +13,93 @@
       </a-col>
     </a-row>
 
+    <a-row type="flex" justify="center" class="api-search-form">
+      <a-col :span="24">
+        <a-form ref="apiSearchConditionsFrom" name="apiSearch" :model="apiSearchConditions" :labelCol="{ span: 4 }"
+          @finish="listApis(1, paginationConf.pageSize)">
+          <a-row>
+            <a-col :span="9">
+              <a-form-item label="API名称" name="name">
+                <a-input v-model:value="apiSearchConditions.name" placeholder="按输入的API名称模糊匹配" />
+              </a-form-item>
+            </a-col>
+
+            <a-col :span="9">
+              <a-form-item label="ID" name="id">
+                <a-input v-model:value="apiSearchConditions.id" placeholder="输入ID精确查找指定的API" />
+              </a-form-item>
+            </a-col>
+
+            <a-col :span="6" style="text-align: right">
+              <a @click="apiSearchConditionsFromExpand = !apiSearchConditionsFromExpand" style="margin-right: 10px;">
+                <template v-if="apiSearchConditionsFromExpand">
+                  <up-outlined />
+                </template>
+                <template v-else>
+                  <down-outlined />
+                </template>
+                更多条件
+              </a>
+              <a-button size="small" type="primary" html-type="submit">查询</a-button>
+              <a-button size="small" style="margin: 0 8px" @click="apiSearchConditionsFromReset">重置
+              </a-button>
+            </a-col>
+          </a-row>
+
+          <a-row v-if="apiSearchConditionsFromExpand">
+            <a-col :span="9">
+              <a-form-item label="方法" name="method">
+                <a-select :show-arrow="true" :allow-clear="true" v-model:value="apiSearchConditions.method"
+                  placeholder="请选择HTTP请求方法">
+                  <a-select-option value="GET">GET</a-select-option>
+                  <a-select-option value="POST">POST</a-select-option>
+                  <a-select-option value="PUT">PUT</a-select-option>
+                  <a-select-option value="DELETE">DELETE</a-select-option>
+                  <a-select-option value="HEAD">HEAD</a-select-option>
+                  <a-select-option value="PATCH">PATCH</a-select-option>
+                  <a-select-option value="OPTIONS">OPTIONS</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+
+            <a-col :span="9">
+              <a-form-item label="路径" name="path">
+                <a-input v-model:value="apiSearchConditions.path" placeholder="API请求路径" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+
+          <a-row v-if="apiSearchConditionsFromExpand">
+            <a-col :span="18">
+              <a-form-item label="标签" name="tag" :labelCol="{ span: 2 }">
+                <div style="display: flex;">
+                  <a-select v-model:value="apiSearchConditions.tags" mode="tags" :allow-clear="true"
+                    placeholder="按标签查找和过滤API,支持AND和OR两种模式" :options="[]">
+                  </a-select>
+                  <a-form-item-rest>
+                    <a-tooltip placement="topLeft" arrow-point-at-center title="标签过滤模式">
+                      <a-select v-model:value="tagModeIsAnd" style="width: 80px;">
+                        <a-select-option value="true">AND</a-select-option>
+                        <a-select-option value="false">OR</a-select-option>
+                      </a-select>
+                    </a-tooltip>
+                  </a-form-item-rest>
+                </div>
+              </a-form-item>
+            </a-col>
+          </a-row>
+
+          <a-row v-if="apiSearchConditionsFromExpand">
+            <a-col :span="18">
+              <a-form-item label="描述" name="description" :labelCol="{ span: 2 }">
+                <a-input v-model:value="apiSearchConditions.description" placeholder="输入API的描述信息进行模糊查询" />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </a-form>
+      </a-col>
+    </a-row>
+
     <a-row type="flex" justify="center">
       <a-col :span="24">
         <a-table :dataSource="apiList" :columns="apiFields" rowKey="id" :pagination="paginationConf" size="small"
@@ -74,7 +161,7 @@
 <script setup>
 import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
 import { reactive, ref } from "vue"
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
+import { DeleteOutlined, EditOutlined, UpOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { ApiService } from "@/services/apiService"
 import { DefaultPaginationConf } from "@/utils/bizConstants"
 import { colorForHttpMethod } from "@/utils/bizConstants"
@@ -86,6 +173,35 @@ const sessionStore = useSessionStore()
 const router = useRouter()
 
 const paginationConf = reactive({ ...DefaultPaginationConf })
+
+// ------------------------- 过滤条件 -------------------------
+
+const apiSearchConditionsFrom = ref()
+const apiSearchConditionsFromExpand = ref(false)
+
+const tagModeIsAnd = ref('true')
+
+const apiSearchConditions = reactive({
+  id: null,
+  name: null,
+  method: null,
+  path: null,
+  tags: [],
+  description: null,
+})
+
+const apiSearchConditionsFromReset = () => {
+  apiSearchConditions.id = null
+  apiSearchConditions.name = null
+  apiSearchConditions.method = null
+  apiSearchConditions.path = null
+  apiSearchConditions.tags = []
+  apiSearchConditions.tagModeIsAnd = 'true'
+  apiSearchConditions.description = null
+}
+
+// ------------------------- API列表
+
 const apiList = ref([])
 
 const apiFields = [
@@ -125,7 +241,18 @@ if (sessionStore.isNormalUser) {
 }
 
 const listApis = (pageNum, pageSize) => {
-  ApiService.listApis(pageNum, pageSize).then((pageData) => {
+  let params = {}
+  for (let pName in apiSearchConditions) {
+    if (apiSearchConditions[pName]) {
+      params[pName] = apiSearchConditions[pName]
+    }
+  }
+
+  if (params['tags'] && tagModeIsAnd.value == 'false') {
+    params['tagModeIsAnd'] = 'false'
+  }
+
+  ApiService.listApis(pageNum, pageSize, params).then((pageData) => {
     apiList.value = pageData.data
     paginationConf.total = pageData.total
     paginationConf.current = pageData.pageNum
@@ -152,4 +279,21 @@ const goToApiDetailPage = (apiId) => {
 }
 
 listApis(paginationConf.current, paginationConf.pageSize)
+
 </script>
+
+<style scoped>
+.api-search-form {
+  background-color: floralwhite;
+  padding: 10px 10px;
+  margin: 10px 0;
+}
+
+:deep(.ant-form-item-label) {
+  font-family: monospace;
+}
+
+:deep(.ant-input) {
+  font-family: monospace;
+}
+</style>

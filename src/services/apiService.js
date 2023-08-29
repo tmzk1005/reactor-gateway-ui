@@ -9,8 +9,12 @@ const updateApi = async (apiId, apiDto) => {
   return await HttpClient.post(ApiPaths.apiById(apiId), apiDto)
 }
 
-const listApis = async (pageNum, pageSize) => {
-  const params = { pageNum: pageNum, pageSize: pageSize }
+const listApis = async (pageNum, pageSize, params) => {
+  if (!params) {
+    params = {}
+  }
+  params['pageNum'] = pageNum
+  params['pageSize'] = pageSize
   return await HttpClient.get(ApiPaths.api, { params: params })
 }
 
