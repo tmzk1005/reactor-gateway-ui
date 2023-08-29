@@ -148,7 +148,7 @@
               </a-row>
 
               <a-row type="flex" justify="center"
-                v-if="snapshot.publishStatus == 'PUBLISHED' || snapshot.publishStatus == 'NOT_UPDATED'">
+                v-if="snapshot.index == 0 || snapshot.publishStatus == 'PUBLISHED' || snapshot.publishStatus == 'NOT_UPDATED'">
                 <a-col :span="24">
                   <a-page-header class="section-container">
 
