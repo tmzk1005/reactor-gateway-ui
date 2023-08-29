@@ -45,6 +45,25 @@
                 </a-tag>
               </span>
             </template>
+
+            <template v-else-if="sessionStore.isNormalUser && column.key === 'action'">
+              <a-space>
+                <a-button type="link" style="padding: 0;" @click="editApi(record.id)">
+                  <template #icon>
+                    <edit-outlined style="padding: 0; margin: 0;" />
+                  </template>
+                  编辑
+                </a-button>
+                <a-tooltip placement="topLeft" arrow-point-at-center title="删除功能暂未实现">
+                  <a-button type="link" style="padding: 0; color: red;" :disabled="true">
+                    <template #icon>
+                      <delete-outlined style="padding: 0; margin: 0;" />
+                    </template>
+                    删除
+                  </a-button>
+                </a-tooltip>
+              </a-space>
+            </template>
           </template>
         </a-table>
       </a-col>
@@ -55,6 +74,7 @@
 <script setup>
 import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
 import { reactive, ref } from "vue"
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
 import { ApiService } from "@/services/apiService"
 import { DefaultPaginationConf } from "@/utils/bizConstants"
 import { colorForHttpMethod } from "@/utils/bizConstants"
@@ -95,12 +115,28 @@ const apiFields = [
   },
 ]
 
+if (sessionStore.isNormalUser) {
+  apiFields.push({
+    title: "操作",
+    key: "action",
+    width: '200px',
+    fixed: 'right',
+  })
+}
+
 const listApis = (pageNum, pageSize) => {
   ApiService.listApis(pageNum, pageSize).then((pageData) => {
     apiList.value = pageData.data
     paginationConf.total = pageData.total
     paginationConf.current = pageData.pageNum
     paginationConf.pageSize = pageData.pageSize
+  })
+}
+
+const editApi = (apiId) => {
+  router.push({
+    name: RouteNames.mgApiUpdate,
+    params: { apiId: apiId }
   })
 }
 

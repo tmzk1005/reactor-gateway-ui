@@ -34,6 +34,12 @@ const apiManagementRoutes = {
       component: () => import("@/views/mg/MgApiCreate.vue")
     },
     {
+      path: RoutePaths.mgApiUpdate,
+      name: RouteNames.mgApiUpdate,
+      props: true,
+      component: () => import("@/views/mg/MgApiCreate.vue")
+    },
+    {
       path: RoutePaths.mgApiDetail,
       name: RouteNames.mgApiDetail,
       props: true,

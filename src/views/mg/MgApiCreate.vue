@@ -1,7 +1,7 @@
 <template>
   <a-layout>
 
-    <rgw-breadcrumb title="新建API" :links="[{ name: 'API', path: RoutePaths.mgApi }]" />
+    <rgw-breadcrumb :title="apiId == null ? '新建API' : '编辑API'" :links="[{ name: 'API', path: RoutePaths.mgApi }]" />
 
     <div class="api-create-container">
       <div class="api-create-left">
@@ -21,7 +21,7 @@
 
               <template #extra>
                 <a-button key="submit" type="primary" :disabled="!readySubmitReq" @click="submitCreateApiReq">
-                  新建API
+                  提交请求
                 </a-button>
               </template>
 
@@ -152,6 +152,44 @@ import { useRouter } from "vue-router"
 
 const router = useRouter()
 
+// -------------------- 初始状态，编辑API相关 --------------------
+
+const props = defineProps({
+  apiId: String
+})
+
+const getPluginIndexInZone1ByNameAndVerion = (name, version) => {
+  for (var i = 0; i < zone1Plugins.value.length; ++i) {
+    if (zone1Plugins.value[i].name == name && zone1Plugins.value[i].version == version) {
+      return i
+    }
+  }
+  return -1
+}
+
+const initForUpdate = () => {
+  ApiService.getApiById(props.apiId).then((data) => {
+    apiDto.name = data.name
+    apiDto.path = data.routeDefinition.path
+    apiDto.methods = data.routeDefinition.methods
+    apiDto.tags = data.tags
+    apiDto.description = data.description
+
+    let plugins = data.routeDefinition.pluginDefinitions
+    for (var i = 0; i < plugins.length; ++i) {
+      let pl = plugins[i]
+      let index = getPluginIndexInZone1ByNameAndVerion(pl.name, pl.version)
+      let plInZone1 = zone1Plugins.value[index]
+      plInZone1.used = true
+      let plInZone2 = createZone2PluginByZone1Plugin(plInZone1)
+      plInZone2.temporary = false
+      plInZone2.draggable = !plInZone2.tail
+      plInZone2.jsonConf = pl.jsonConf
+      zone2Plugins.value.push(plInZone2)
+    }
+  })
+}
+
 // -------------------- 拖拽逻辑:初始状态 --------------------
 const zone1Plugins = ref([])
 
@@ -161,6 +199,10 @@ const loadAllPlugins = () => {
     for (var i = 0; i < zone1Plugins.value.length; i++) {
       zone1Plugins.value[i].used = false
       zone1Plugins.value[i].draggable = true
+    }
+
+    if (props.apiId) {
+      initForUpdate()
     }
   })
 }
@@ -510,13 +552,25 @@ const submitCreateApiReq = () => {
       })
     }
 
-    ApiService.createApi(finalApiDto).then((data) => {
-      notification.success({ message: "新建API成功" })
-      router.push({
-        name: RouteNames.mgApiDetail,
-        params: { apiId: data.id }
+    if (props.apiId) {
+      // 编辑
+      ApiService.updateApi(props.apiId, finalApiDto).then((data) => {
+        notification.success({ message: "编辑API成功" })
+        router.push({
+          name: RouteNames.mgApiDetail,
+          params: { apiId: data.id }
+        })
       })
-    })
+    } else {
+      // 新建
+      ApiService.createApi(finalApiDto).then((data) => {
+        notification.success({ message: "新建API成功" })
+        router.push({
+          name: RouteNames.mgApiDetail,
+          params: { apiId: data.id }
+        })
+      })
+    }
   })
 }
 

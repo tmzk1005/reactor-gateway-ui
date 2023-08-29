@@ -5,6 +5,10 @@ const createApi = async (apiDto) => {
   return await HttpClient.post(ApiPaths.api, apiDto)
 }
 
+const updateApi = async (apiId, apiDto) => {
+  return await HttpClient.post(ApiPaths.apiById(apiId), apiDto)
+}
+
 const listApis = async (pageNum, pageSize) => {
   const params = { pageNum: pageNum, pageSize: pageSize }
   return await HttpClient.get(ApiPaths.api, { params: params })
@@ -30,7 +34,7 @@ const searchReleasedApi = async (envId, searchText, pageNum, pageSize) => {
 }
 
 const ApiService = {
-  createApi, listApis, getApiById, publishApi, unpublishApi, searchReleasedApi
+  createApi, updateApi, listApis, getApiById, publishApi, unpublishApi, searchReleasedApi
 }
 
 export { ApiService }

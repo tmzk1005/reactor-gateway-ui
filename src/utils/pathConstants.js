@@ -7,6 +7,7 @@ const RoutePaths = {
     mgUser: "/mg/user",
     mgApi: "/mg/api",
     mgApiCreate: "/mg/api/create",
+    mgApiUpdate: "/mg/api/update/:apiId",
     mgApiDetail: "/mg/api/detail/:apiId",
     mgAccessLog: "/mg/access-log",
     mgApiSubscription: "/mg/api-subscription",
@@ -57,7 +58,8 @@ const ApiPaths = {
 }
 
 const RouteNames = {
-    mgApiDetail: 'mgApiDetail'
+    mgApiDetail: 'mgApiDetail',
+    mgApiUpdate: 'mgApiUpdate',
 }
 
 export { RoutePaths, ApiPaths, RouteNames }
