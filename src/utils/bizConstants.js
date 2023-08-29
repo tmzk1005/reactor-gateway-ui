@@ -70,4 +70,47 @@ const userBaseInfoFormCheckRule = {
   ],
 }
 
-export { Role, RoleSelectOptions, DefaultPaginationConf, colorForHttpMethod, userBaseInfoFormCheckRule }
+const createStatusCodeTreeData = () => {
+  let codes = [
+    [100, 101, 102],
+    [200, 201, 202, 203, 204, 205, 206, 207],
+    [300, 301, 302, 303, 304, 305, 307, 308],
+    [
+      400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410,
+      411, 412, 413, 414, 415, 416, 417,
+      421, 422, 423, 424, 425, 426, 428, 429, 431
+    ],
+    [500, 501, 502, 503, 504, 505, 506, 507, 510, 511]
+  ]
+  let data = []
+  for (let bigCode = 1; bigCode <= 5; ++bigCode) {
+    let subData = {
+      title: bigCode + 'XX',
+      value: bigCode,
+      color: 'blue',
+      children: [
+      ],
+    }
+    let color = null
+    if (bigCode == 2) {
+      color = 'green'
+    } else if (bigCode == 4) {
+      color = 'orange'
+    } else if (bigCode == 5) {
+      color = 'red'
+    }
+    for (let j in codes[bigCode - 1]) {
+      let item = {
+        title: codes[bigCode - 1][j],
+        value: codes[bigCode - 1][j],
+        color: color,
+      }
+      subData['children'].push(item)
+    }
+    data.push(subData)
+  }
+  return data
+}
+const StatusCodeTreeData = createStatusCodeTreeData()
+
+export { Role, RoleSelectOptions, DefaultPaginationConf, colorForHttpMethod, userBaseInfoFormCheckRule, StatusCodeTreeData }
