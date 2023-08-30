@@ -8,7 +8,7 @@
         <a-page-header title="API基本信息" style="font-family: monospace;">
 
           <template #extra>
-            <a-button type="link" @click="advanceConfDialogVisible = true">
+            <a-button type="link" @click="openAdvanceConfDialog">
               <template #icon>
                 <setting-outlined style="padding: 0; margin: 0;" />
               </template>
@@ -234,6 +234,17 @@ const initForUpdate = () => {
       plInZone2.jsonConf = pl.jsonConf
       zone2Plugins.value.push(plInZone2)
     }
+
+    let accessLogConf = data.routeDefinition.accessLogConf
+
+    if (accessLogConf) {
+      apiAdvanceConf.accessLogEnabled = true
+      apiAdvanceConf.accessLogConf = { ...accessLogConf }
+      // 字节数转KB
+      apiAdvanceConf.accessLogConf.bodyLimit = apiAdvanceConf.accessLogConf.bodyLimit / 1024
+    }
+
+    apiAdvanceConf.mdDoc = data.mdDoc
   })
 }
 
@@ -510,6 +521,7 @@ const reset = () => {
 const save = () => {
   let content = editorRef.value.getContent()
   lastPlugin.jsonConf = content
+  configPluginDialogVisible.value = false
 }
 
 // -------------------- 高级配置 --------------------
@@ -527,6 +539,18 @@ const apiAdvanceConf = reactive({
   },
   mdDoc: "",
 })
+
+let mdDocSettedForUpdated = false
+
+const openAdvanceConfDialog = () => {
+  advanceConfDialogVisible.value = true
+  if (!mdDocSettedForUpdated) {
+    mdDocSettedForUpdated = true
+    nextTick(() => {
+      mdDocEditorRef.value.setContent(apiAdvanceConf.mdDoc)
+    })
+  }
+}
 
 // -------------------- 提交新建API请求 --------------------
 
@@ -598,9 +622,11 @@ const submitCreateApiReq = () => {
       name: apiDto.name,
       description: apiDto.description,
       tags: apiDto.tags,
+      mdDoc: "",
       routeDefinition: {
         path: apiDto.path,
         methods: apiDto.methods,
+        accessLogConf: null,
         pluginDefinitions: []
       }
     }
@@ -614,6 +640,14 @@ const submitCreateApiReq = () => {
         jsonConf: zone2Plugins.value[i].jsonConf
       })
     }
+
+    if (apiAdvanceConf.accessLogEnabled) {
+      finalApiDto.routeDefinition.accessLogConf = { ...apiAdvanceConf.accessLogConf }
+      // KB转字节数
+      finalApiDto.routeDefinition.accessLogConf.bodyLimit = finalApiDto.routeDefinition.accessLogConf.bodyLimit * 1024
+    }
+    
+    finalApiDto.mdDoc = mdDocEditorRef.value.getContent()
 
     if (props.apiId) {
       // 编辑
