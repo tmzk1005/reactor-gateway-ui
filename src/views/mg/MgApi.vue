@@ -107,9 +107,25 @@
           <template v-slot:bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'name'">
               <span>
-                <a-button style="padding-left: 0;" type="link" @click="goToApiDetailPage(record.id)">
-                  {{ record.name }}
-                </a-button>
+                <a-popover placement="topLeft">
+                  <template #content>
+                    <a-descriptions bordered :column="1" size="small">
+                      <a-descriptions-item label="ID">
+                        <a-space>
+                          <span style="font-weight: 700;">
+                            {{ record.id }}
+                          </span>
+                          <span>
+                            <a-button type="link" @click="() => copy(record.id)">复制</a-button>
+                          </span>
+                        </a-space>
+                      </a-descriptions-item>
+                    </a-descriptions>
+                  </template>
+                  <a-button style="padding-left: 0;" type="link" @click="goToApiDetailPage(record.id)">
+                    {{ record.name }}
+                  </a-button>
+                </a-popover>
               </span>
             </template>
             <template v-else-if="column.key === 'methods'">
@@ -168,11 +184,18 @@ import { colorForHttpMethod } from "@/utils/bizConstants"
 import { useSessionStore } from "@/stores/session"
 import { useRouter } from "vue-router"
 import { RouteNames, RoutePaths } from '@/utils/pathConstants'
+import { message } from 'ant-design-vue'
 
 const sessionStore = useSessionStore()
 const router = useRouter()
 
 const paginationConf = reactive({ ...DefaultPaginationConf })
+
+const copy = (text) => {
+  navigator.clipboard.writeText(text).then(() => {
+    message.info("已复制")
+  })
+}
 
 // ------------------------- 过滤条件 -------------------------
 
@@ -206,28 +229,35 @@ const apiList = ref([])
 
 const apiFields = [
   {
-    title: "API-ID",
-    dataIndex: "id",
-    width: '120px',
-    minWidth: '120px'
-  },
-  {
     title: "API名称",
     dataIndex: "name",
+    width: '200px',
+    ellipsis: true,
   },
   {
     title: "HTTP请求方法",
     key: "methods",
     dataIndex: ["routeDefinition", "methods"],
+    width: '200px',
+    ellipsis: true,
   },
   {
     title: "HTTP请求路径",
     key: "path",
     dataIndex: ["routeDefinition", "path"],
+    width: '300px',
+    ellipsis: true,
   },
   {
     title: "标签",
     dataIndex: "tags",
+    width: '300px',
+    ellipsis: true,
+  },
+  {
+    title: "描述",
+    dataIndex: "description",
+    ellipsis: true,
   },
 ]
 
