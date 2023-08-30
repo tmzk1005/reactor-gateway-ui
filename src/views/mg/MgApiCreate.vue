@@ -8,6 +8,12 @@
         <a-page-header title="API基本信息" style="font-family: monospace;">
 
           <template #extra>
+            <a-button type="link" @click="advanceConfDialogVisible = true">
+              <template #icon>
+                <setting-outlined style="padding: 0; margin: 0;" />
+              </template>
+              高级配置
+            </a-button>
             <a-button key="submit" type="primary" :disabled="!readySubmitReq" @click="submitCreateApiReq">
               提交请求
             </a-button>
@@ -122,8 +128,56 @@
           </template>
 
           <div class="editor-container">
-            <json-editor ref="editorRef" />
+            <ace-editor language="json" ref="editorRef" />
           </div>
+        </a-modal>
+      </a-col>
+    </a-row>
+
+    <a-row type="flex" justify="center">
+      <a-col :span="24">
+        <a-modal width="60%" v-model:open="advanceConfDialogVisible">
+          <a-page-header title="访问日志" sub-title="配置访问日志审计行为" style="font-family: monospace;">
+            <div class="advance-conf-section">
+              <a-form :model="apiAdvanceConf" :labelCol="{ span: 4 }" :wrapperCol="{ span: 8 }">
+                <a-form-item label="是否开启访问日志审计">
+                  <a-switch v-model:checked="apiAdvanceConf.accessLogEnabled" checked-children="开"
+                    un-checked-children="关" />
+                </a-form-item>
+                <a-form-item label="审计选项">
+                  <a-checkbox v-model:checked="apiAdvanceConf.accessLogConf.reqHeadersEnabled"
+                    :disabled="!apiAdvanceConf.accessLogEnabled">请求头</a-checkbox>
+                  <a-checkbox v-model:checked="apiAdvanceConf.accessLogConf.reqBodyEnabled"
+                    :disabled="!apiAdvanceConf.accessLogEnabled">请求体</a-checkbox>
+                  <a-checkbox v-model:checked="apiAdvanceConf.accessLogConf.respHeadersEnabled"
+                    :disabled="!apiAdvanceConf.accessLogEnabled">响应头</a-checkbox>
+                  <a-checkbox v-model:checked="apiAdvanceConf.accessLogConf.respBodyEnabled"
+                    :disabled="!apiAdvanceConf.accessLogEnabled">响应体</a-checkbox>
+                </a-form-item>
+                <a-form-item label="审计报文大小上限">
+                  <a-tooltip placement="topLeft" arrow-point-at-center
+                    title="最大允许设置为1MB，即1024KB。审计请求体和响应体比较消耗网关组件的内存，会影响网关的性能，当请求体和响应体的大小超过设置的上限大小时，不会审计。">
+                    <a-input-number v-model:value="apiAdvanceConf.accessLogConf.bodyLimit" addon-after="KB"
+                      :disabled="!apiAdvanceConf.accessLogEnabled" style="width: 150px;" :min="1" :max="1024" :step="1">
+                      <template #suffix>
+                        KB
+                      </template>
+                    </a-input-number>
+                  </a-tooltip>
+                </a-form-item>
+              </a-form>
+            </div>
+          </a-page-header>
+
+          <a-page-header title="文档" sub-title="使用markdown编写API文档" style="font-family: monospace; padding-top: 10px;">
+            <div class="markdown-container">
+              <ace-editor language="markdown" :min-lines="22" :max-lines="22" ref="mdDocEditorRef" />
+            </div>
+          </a-page-header>
+
+          <template #footer>
+            <a-button type="primary" @click="advanceConfDialogVisible = false">保存</a-button>
+          </template>
         </a-modal>
       </a-col>
     </a-row>
@@ -139,7 +193,7 @@ import { computed, nextTick, reactive, ref } from 'vue'
 import { notification } from "ant-design-vue"
 import { PluginService } from '@/services/pluginService'
 import { ApiService } from '@/services/apiService'
-import JsonEditor from '@/components/JsonEditor.vue'
+import AceEditor from '@/components/AceEditor.vue'
 import { PATTERN_NORMAL_NAME_ZH } from "@/utils/patternConstants"
 import { useRouter } from "vue-router"
 
@@ -458,6 +512,22 @@ const save = () => {
   lastPlugin.jsonConf = content
 }
 
+// -------------------- 高级配置 --------------------
+
+const advanceConfDialogVisible = ref(false)
+const mdDocEditorRef = ref()
+const apiAdvanceConf = reactive({
+  accessLogEnabled: false,
+  accessLogConf: {
+    reqHeadersEnabled: false,
+    respHeadersEnabled: false,
+    reqBodyEnabled: false,
+    respBodyEnabled: false,
+    bodyLimit: 8,
+  },
+  mdDoc: "",
+})
+
 // -------------------- 提交新建API请求 --------------------
 
 const readySubmitReq = computed(() => zone2Plugins.value.length != 0
@@ -606,5 +676,17 @@ const submitCreateApiReq = () => {
 .editor-container {
   box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
   transform: translateZ(-10px);
+}
+
+.markdown-container {
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
+  transform: translateZ(-10px);
+}
+
+.advance-conf-section {
+  background-color: #fdfdfd;
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
+  transform: translateZ(-10px);
+  padding: 10px 0;
 }
 </style>
