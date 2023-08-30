@@ -3,137 +3,130 @@
 
     <rgw-breadcrumb :title="apiId == null ? '新建API' : '编辑API'" :links="[{ name: 'API', path: RoutePaths.mgApi }]" />
 
-    <div class="api-create-container">
-      <div class="api-create-left">
+    <a-row>
+      <a-col :span="24">
+        <a-page-header title="API基本信息" style="font-family: monospace;">
 
-        <!-- zone 1 -->
-        <api-plugin v-for="plugin in zone1Plugins" :data="plugin" :key="plugin.id" v-show="!plugin.used"
-          :draggable="plugin.draggable && (!plugin.tail || !zone2HasTail)" @dragstart="dragFromZone1ToZone2Start(plugin)"
-          @dragend="dragFromZone1ToZone2End($event)">
-        </api-plugin>
+          <template #extra>
+            <a-button key="submit" type="primary" :disabled="!readySubmitReq" @click="submitCreateApiReq">
+              提交请求
+            </a-button>
+          </template>
 
-      </div>
+          <a-form ref="apiDtoFormRef" :model="apiDto" :rules="apiDtoRules">
+            <a-row>
+              <a-col :span="8">
+                <a-form-item label="名称" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }" name="name">
+                  <a-input v-model:value="apiDto.name" placeholder="请输入API的名称" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="路径" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }" name="path">
+                  <a-input v-model:value="apiDto.path" placeholder="请输入HTTP请求路径" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="方法" name="methods" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }">
+                  <a-select mode="multiple" :show-arrow="true" v-model:value="apiDto.methods" placeholder="请选择HTTP请求方法">
+                    <a-select-option value="GET">GET</a-select-option>
+                    <a-select-option value="POST">POST</a-select-option>
+                    <a-select-option value="PUT">PUT</a-select-option>
+                    <a-select-option value="DELETE">DELETE</a-select-option>
+                    <a-select-option value="HEAD">HEAD</a-select-option>
+                    <a-select-option value="PATCH">PATCH</a-select-option>
+                    <a-select-option value="OPTIONS">OPTIONS</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
 
-      <div class="api-create-right">
-        <a-row>
-          <a-col :span="24">
-            <a-page-header title="API基本信息" style="font-family: monospace;">
+            <a-row>
+              <a-col :span="8">
+                <a-form-item label="标签" name="tags" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }">
+                  <a-select v-model:value="apiDto.tags" mode="tags" :allow-clear="true" placeholder="给API打上标签方便查找和过滤"
+                    :options="[]">
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :span="16">
+                <a-form-item label="描述" name="description" :label-col="{ span: 2 }" :wrapper-col="{ span: 18 }">
+                  <a-input v-model:value="apiDto.description" placeholder="对API的功能做简要的描述" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+        </a-page-header>
+      </a-col>
+    </a-row>
 
-              <template #extra>
-                <a-button key="submit" type="primary" :disabled="!readySubmitReq" @click="submitCreateApiReq">
-                  提交请求
-                </a-button>
-              </template>
+    <a-row style="padding-top: 20px;">
+      <a-col :span="24">
+        <a-page-header title="API处理流程" style="font-family: monospace; ">
+          <div class="api-create-container">
+            <div class="api-create-left">
+              <!-- zone 1 -->
+              <api-plugin v-for="plugin in zone1Plugins" :data="plugin" :key="plugin.id" v-show="!plugin.used"
+                :draggable="plugin.draggable && (!plugin.tail || !zone2HasTail)"
+                @dragstart="dragFromZone1ToZone2Start(plugin)" @dragend="dragFromZone1ToZone2End($event)">
+              </api-plugin>
+            </div>
 
-              <a-form ref="apiDtoFormRef" :model="apiDto" :rules="apiDtoRules">
-                <a-row>
-                  <a-col :span="8">
-                    <a-form-item label="名称" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }" name="name">
-                      <a-input v-model:value="apiDto.name" placeholder="请输入API的名称" />
-                    </a-form-item>
-                  </a-col>
-                  <a-col :span="8">
-                    <a-form-item label="路径" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }" name="path">
-                      <a-input v-model:value="apiDto.path" placeholder="请输入HTTP请求路径" />
-                    </a-form-item>
-                  </a-col>
-                  <a-col :span="8">
-                    <a-form-item label="方法" name="methods" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }">
-                      <a-select mode="multiple" :show-arrow="true" v-model:value="apiDto.methods"
-                        placeholder="请选择HTTP请求方法">
-                        <a-select-option value="GET">GET</a-select-option>
-                        <a-select-option value="POST">POST</a-select-option>
-                        <a-select-option value="PUT">PUT</a-select-option>
-                        <a-select-option value="DELETE">DELETE</a-select-option>
-                        <a-select-option value="HEAD">HEAD</a-select-option>
-                        <a-select-option value="PATCH">PATCH</a-select-option>
-                        <a-select-option value="OPTIONS">OPTIONS</a-select-option>
-                      </a-select>
-                    </a-form-item>
-                  </a-col>
-                </a-row>
+            <div class="configuration-container" @dragenter="zone2DragEnter($event)" @dragover="zone2DragOver($event)"
+              @dragleave="zone2DragLevel($event)" @drop="zone2DragDrop()">
+              <!-- zone 2 -->
+              <api-plugin-instance v-for="plugin in zone2Plugins" :data="plugin" :key="plugin.id"
+                :style="{ border: plugin.temporary ? 'dashed' : '' }" :draggable="plugin.draggable && !plugin.tail"
+                @dblclick="configPlugin(plugin)" @dragstart="dragFromZone2ToZone2Start(plugin)"
+                @dragend="dragFromZone2ToZone2End($event)" @dragenter="zone2PluginDragEnter($event, plugin)"
+                @dragover="zone2PluginDragOver($event)" @dragleave="zone2PluginDragLeave($event)"
+                @drop="zone2PluginDragDrop($event)">
+                <template #extra>
+                  <a-button type="link" style="font-size: 1.1rem;" @click="configPlugin(plugin)">
+                    <template #icon>
+                      <setting-outlined style="padding: 0; margin: 0;" />
+                    </template>
+                    配置
+                  </a-button>
+                  <a-button type="link" style="font-size: 1.1rem;" @click="removePluginInZone2(plugin)">
+                    <template #icon>
+                      <delete-outlined style="padding: 0; margin: 0;" />
+                    </template>
+                    删除
+                  </a-button>
+                </template>
+              </api-plugin-instance>
+            </div>
+          </div>
+        </a-page-header>
+      </a-col>
+    </a-row>
 
-                <a-row>
-                  <a-col :span="8">
-                    <a-form-item label="标签" name="tags" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }">
-                      <a-select v-model:value="apiDto.tags" mode="tags" :allow-clear="true" placeholder="给API打上标签方便查找和过滤"
-                        :options="[]">
-                      </a-select>
-                    </a-form-item>
-                  </a-col>
-                  <a-col :span="16">
-                    <a-form-item label="描述" name="description" :label-col="{ span: 2 }" :wrapper-col="{ span: 18 }">
-                      <a-input v-model:value="apiDto.description" placeholder="对API的功能做简要的描述" />
-                    </a-form-item>
-                  </a-col>
-                </a-row>
-              </a-form>
-            </a-page-header>
-          </a-col>
-        </a-row>
+    <a-row type="flex" justify="center">
+      <a-col :span="24">
+        <a-modal width="60%" v-model:open="configPluginDialogVisible" @cancel="save">
 
-        <a-row style="padding-top: 20px;">
-          <a-col :span="24">
-            <a-page-header title="API处理流程" style="font-family: monospace; ">
-              <div class="configuration-container" @dragenter="zone2DragEnter($event)" @dragover="zone2DragOver($event)"
-                @dragleave="zone2DragLevel($event)" @drop="zone2DragDrop()">
+          <template #title>
+            <a-space style="align-items: flex-end;">
+              <span style="font-size: 1.5rem;">插件配置</span>
+              <span style="font-size: 1.3rem; color:cornflowerblue">{{ configPluginDialogTitle }}</span>
+            </a-space>
+          </template>
 
-                <!-- zone 2 -->
-                <api-plugin-instance v-for="plugin in zone2Plugins" :data="plugin" :key="plugin.id"
-                  :style="{ border: plugin.temporary ? 'dashed' : '' }" :draggable="plugin.draggable && !plugin.tail"
-                  @dblclick="configPlugin(plugin)" @dragstart="dragFromZone2ToZone2Start(plugin)"
-                  @dragend="dragFromZone2ToZone2End($event)" @dragenter="zone2PluginDragEnter($event, plugin)"
-                  @dragover="zone2PluginDragOver($event)" @dragleave="zone2PluginDragLeave($event)"
-                  @drop="zone2PluginDragDrop($event)">
-                  <template #extra>
-                    <a-button type="link" style="font-size: 1.1rem;" @click="configPlugin(plugin)">
-                      <template #icon>
-                        <setting-outlined style="padding: 0; margin: 0;" />
-                      </template>
-                      配置
-                    </a-button>
-                    <a-button type="link" style="font-size: 1.1rem;" @click="removePluginInZone2(plugin)">
-                      <template #icon>
-                        <delete-outlined style="padding: 0; margin: 0;" />
-                      </template>
-                      删除
-                    </a-button>
-                  </template>
-                </api-plugin-instance>
+          <template #footer>
+            <a-space style="float: left;">
+              <a-button key="doFormat" type="primary" @click="validate">校验</a-button>
+              <a-button key="doFormat" type="primary" @click="doFormat">格式化</a-button>
+            </a-space>
+            <a-button key="reset" @click="reset">重置</a-button>
+            <a-button key="saveEnvs" type="primary" @click="save">保存</a-button>
+          </template>
 
-              </div>
-            </a-page-header>
-          </a-col>
-        </a-row>
-
-      </div>
-    </div>
-
-    <div>
-      <a-modal width="60%" v-model:open="configPluginDialogVisible" @cancel="save">
-
-        <template #title>
-          <a-space style="align-items: flex-end;">
-            <span style="font-size: 1.5rem;">插件配置</span>
-            <span style="font-size: 1.3rem; color:cornflowerblue">{{ configPluginDialogTitle }}</span>
-          </a-space>
-        </template>
-
-        <template #footer>
-          <a-space style="float: left;">
-            <a-button key="doFormat" type="primary" @click="validate">校验</a-button>
-            <a-button key="doFormat" type="primary" @click="doFormat">格式化</a-button>
-          </a-space>
-          <a-button key="reset" @click="reset">重置</a-button>
-          <a-button key="saveEnvs" type="primary" @click="save">保存</a-button>
-        </template>
-
-        <div class="editor-container">
-          <json-editor ref="editorRef" />
-        </div>
-      </a-modal>
-    </div>
-
+          <div class="editor-container">
+            <json-editor ref="editorRef" />
+          </div>
+        </a-modal>
+      </a-col>
+    </a-row>
   </a-layout>
 </template>
 
@@ -580,7 +573,7 @@ const submitCreateApiReq = () => {
 .api-create-container {
   padding-top: 1rem;
   width: 100%;
-  height: calc(100vh - 85px);
+  height: calc(100vh - 420px);
 }
 
 .api-create-left {
@@ -590,17 +583,14 @@ const submitCreateApiReq = () => {
   overflow-x: hidden;
   overflow-y: hidden;
   float: left;
-  height: 100%;
+  height: calc(100vh - 420px);
+  background-color: #fdfdfd;
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
+  transform: translateZ(10px);
 }
 
 .api-create-left:hover {
   overflow-y: auto;
-}
-
-.api-create-right {
-  margin-left: 250px;
-  height: 100%;
-  overflow: auto;
 }
 
 .configuration-container {
