@@ -268,9 +268,10 @@ const getApi = (id) => {
       lastModifiedDate: api.value.lastModifiedDate,
       routeDefinition: api.value.routeDefinition
     })
-    for (var key in api.value.publishSnapshots) {
+    let envIds = Object.getOwnPropertyNames(api.value.publishSnapshots).sort()
+    for (var i in envIds) {
       index += 1
-      let ps = api.value.publishSnapshots[key]
+      let ps = api.value.publishSnapshots[envIds[i]]
       ps.index = index
       arr.push(ps)
     }

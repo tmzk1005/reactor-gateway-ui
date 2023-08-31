@@ -14,8 +14,6 @@ const props = defineProps({
 
 const hasHeaders = props.headers != null && props.headers != undefined
 
-console.log(props.headers)
-
 const convertHeadersToText = () => {
   let arr = []
   if (!props.headers) {
