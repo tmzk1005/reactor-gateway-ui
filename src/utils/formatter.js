@@ -27,25 +27,25 @@ const colorForResponseStatus = (status) => {
 const colorForRequestTimeMillisCost = (timeMillis) =>  {
   if (timeMillis < 50) {
     // dark green
-    return '#137752'
+    return ['#137752', Math.ceil(timeMillis / 5)]
   } else if (timeMillis < 100) {
     // green
-    return ' #19a974'
+    return ['#19a974', Math.ceil(timeMillis / 5)]
   } else if (timeMillis < 500) {
     // light green
-    return '#9eebcf'
+    return ['#9eebcf', 20 + Math.ceil((timeMillis - 100) / 16)]
   } else if (timeMillis < 1000) {
     // yellow
-    return '#ffde37'
+    return ['#ffde37', 45 + Math.ceil((timeMillis - 500) / 25)]
   } else if (timeMillis < 5000) {
     // light red
-    return '#ff725c'
+    return ['#ff725c', 65 + Math.ceil(timeMillis - 1000) / 400]
   } else if (timeMillis < 10000) {
     // red
-    return '#ff6300'
+    return ['#ff6300', 75 + Math.ceil(timeMillis - 5000) / 1000]
   } else {
     // dark-red
-    return '#e7040f'
+    return ['#e7040f', 80]
   }
 }
 

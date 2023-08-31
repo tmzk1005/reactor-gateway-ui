@@ -1,5 +1,5 @@
 <template>
-  <a-tooltip placement="topLeft" :title="value + ' 字节'">
+  <a-tooltip placement="topLeft" :title="value.toLocaleString() + ' 字节'">
     <div style="display: inline;">
       <span style="float: left">
         {{ data[0] }}
