@@ -164,11 +164,91 @@
             </template>
 
             <template v-else-if="column.key === 'repsonseInfoCode'">
-              <a-tag :color="colorForResponseStatus(record.responseInfo.code)">{{ record.responseInfo.code }}
+              <a-tag :color="colorForResponseStatus(record.responseInfo.code)">
+                {{ record.responseInfo.code }}
               </a-tag>
+            </template>
+
+            <template v-else-if="column.dataIndex == 'requestId'">
+              <a-tooltip placement="topLeft" color="blue" title="点击查看详细日志">
+                <a-button type="link" style="padding: 0;" @click="showAccessLogDetail(record)">
+                  {{ record.requestId }}
+                </a-button>
+              </a-tooltip>
             </template>
           </template>
         </a-table>
+      </a-col>
+    </a-row>
+
+    <a-row type="flex" justify="center">
+      <a-col>
+        <a-modal width="80%" v-model:open="detailDialogVisible" :title="`访问日志详情 ${detailsToShow.requestId}`">
+          <div style="max-height: calc(100vh - 320px); margin-top: 25px; overflow: auto;">
+            <a-page-header class="section-container" title="请求"
+              :sub-title="detailsToShow.requestInfo.bodyBase64 ? '请求体使用Base64编码' : ''">
+
+              <a-descriptions :column="1" bordered :label-style="{ width: '100px', 'vertical-align': 'top' }">
+                <a-descriptions-item label="请求行">
+                  <span>
+                    <a-tag :color="colorForHttpMethod(detailsToShow.requestInfo.method)">
+                      {{ detailsToShow.requestInfo.method }}
+                    </a-tag>
+                  </span>
+                  <span>{{ detailsToShow.requestInfo.uri }}</span>
+                </a-descriptions-item>
+                <a-descriptions-item label="请求头">
+                  <http-headers :headers="detailsToShow.requestInfo.headers" :key="'req' + detailsToShow.requestId" />
+                </a-descriptions-item>
+                <a-descriptions-item label="请求体">
+                  <div class="big-text-container">
+                    {{ detailsToShow.requestInfo.body }}
+                  </div>
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-page-header>
+
+            <a-page-header class="section-container" title="响应"
+              :sub-title="detailsToShow.responseInfo.bodyBase64 ? '响应体使用Base64编码' : ''">
+              <a-descriptions :column="1" bordered :label-style="{ width: '100px', 'vertical-align': 'top' }">
+                <a-descriptions-item label="响应码">
+                  <a-tag :color="colorForResponseStatus(detailsToShow.responseInfo.code)">
+                    {{ detailsToShow.responseInfo.code }}
+                  </a-tag>
+                </a-descriptions-item>
+                <a-descriptions-item label="响应头">
+                  <http-headers :headers="detailsToShow.responseInfo.headers" :key="'resp' + detailsToShow.requestId" />
+                </a-descriptions-item>
+                <a-descriptions-item label="响应体">
+                  <div class="big-text-container">
+                    {{ detailsToShow.responseInfo.body }}
+                  </div>
+                </a-descriptions-item>
+              </a-descriptions>
+            </a-page-header>
+
+            <a-page-header class="section-container" title="扩展信息">
+              <div v-if="detailsToShow.extraInfo && Object.getOwnPropertyNames(detailsToShow.extraInfo).length > 0"
+                class="big-text-container">
+                <a-descriptions :column="1" bordered :label-style="{ width: '100px', 'vertical-align': 'top' }"
+                  v-for="keyName in detailsToShow.extraInfo" :key="`${detailsToShow.requestId}-${keyName}`">
+                  <a-descriptions-item :label="keyName">
+                    <div class="big-text-container">
+                      <highlightjs language="json" :code="JSON.stringify(detailsToShow.extraInfo[keyName], null, 4)" />
+                    </div>
+                  </a-descriptions-item>
+                </a-descriptions>
+              </div>
+              <div v-else>
+                <span style="color: chocolate;">无扩展信息</span>
+              </div>
+            </a-page-header>
+          </div>
+
+          <template #footer>
+            <a-button type="primary" @click="detailDialogVisible = false">关闭</a-button>
+          </template>
+        </a-modal>
       </a-col>
     </a-row>
 
@@ -179,6 +259,8 @@
 import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
 import TimeCost from "@/components/TimeCost.vue"
 import FlowBytesShow from "@/components/FlowBytesShow.vue"
+import HttpHeaders from "@/components/HttpHeaders.vue"
+
 import dayjs from "dayjs"
 import { onMounted, reactive, ref } from 'vue'
 import { DefaultPaginationConf } from "@/utils/bizConstants"
@@ -258,7 +340,13 @@ const accessLogFields = [
   {
     title: "客户端IP",
     dataIndex: ["clientInfo", "ip"],
-    width: '200px',
+    width: '140px',
+    ellipsis: true,
+  },
+  {
+    title: "客户端应用名称",
+    dataIndex: "clientAppName",
+    width: '180px',
     ellipsis: true,
   },
   {
@@ -334,6 +422,18 @@ onMounted(() => {
     searchAccessLogs(contextEnvId.value, paginationConf.current, paginationConf.pageSize)
   })
 })
+
+// -------------------- 模态框展示详情 --------------------
+
+const detailDialogVisible = ref(false)
+
+const detailsToShow = ref({})
+
+const showAccessLogDetail = (accessLog) => {
+  detailsToShow.value = accessLog
+  detailDialogVisible.value = true
+}
+
 </script>
 
 <style scoped>
@@ -341,5 +441,16 @@ onMounted(() => {
   background-color: floralwhite;
   padding: 10px 10px;
   margin: 10px 0;
+}
+
+.section-container {
+  margin: 20px;
+  box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.big-text-container {
+  width: 100%;
+  max-height: 350px;
+  overflow: auto;
 }
 </style>

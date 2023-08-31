@@ -11,7 +11,7 @@ const timeMillisDisplay = (num) => {
 }
 
 const colorForResponseStatus = (status) => {
-  if (status>= 200 && status < 300) {
+  if (status >= 200 && status < 300) {
     return 'green'
   } else if (status >= 300 && status < 400) {
     return 'blue'
@@ -24,7 +24,7 @@ const colorForResponseStatus = (status) => {
   }
 }
 
-const colorForRequestTimeMillisCost = (timeMillis) =>  {
+const colorForRequestTimeMillisCost = (timeMillis) => {
   if (timeMillis < 50) {
     // dark green
     return ['#137752', Math.ceil(timeMillis / 5)]
@@ -53,11 +53,11 @@ const byteCountDisplay = (num) => {
   if (num < 1014) {
     return [num, 'B']
   } else if (num < 1024 * 1024) {
-    return [(num / 1024 ).toFixed(2), 'KB']
+    return [(num / 1024).toFixed(2), 'KB']
   } else if (num < 1024 * 1024 * 1024) {
-    return [(num / 1024 / 1024 ).toFixed(2), 'MB']
+    return [(num / 1024 / 1024).toFixed(2), 'MB']
   } else if (num < 1024 * 1024 * 1024 * 1024) {
-    return [(num / 1024 / 1024 / 1024 ).toFixed(2), 'GB']
+    return [(num / 1024 / 1024 / 1024).toFixed(2), 'GB']
   }
 }
 
