@@ -260,7 +260,7 @@ import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
 import TimeCost from "@/components/TimeCost.vue"
 import FlowBytesShow from "@/components/FlowBytesShow.vue"
 import HttpHeaders from "@/components/HttpHeaders.vue"
-
+import locale from 'ant-design-vue/es/date-picker/locale/zh_CN'
 import dayjs from "dayjs"
 import { onMounted, reactive, ref } from 'vue'
 import { DefaultPaginationConf } from "@/utils/bizConstants"
