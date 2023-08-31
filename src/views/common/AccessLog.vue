@@ -151,15 +151,16 @@
               </span>
             </template>
 
+            <template v-else-if="column.key === 'flowUp'">
+              <flow-bytes-show :value="record.responseInfo.bodySize" />
+            </template>
+
+            <template v-else-if="column.key === 'flowDown'">
+              <flow-bytes-show :value="record.responseInfo.bodySize" />
+            </template>
+
             <template v-else-if="column.dataIndex === 'millisCost'">
-              <span>
-                <a-tooltip placement="topLeft" :title="record.millisCost + ' 毫秒'">
-                  <span :style="{ float: 'left', color: colorForRequestTimeMillisCost(record.millisCost) }">
-                    {{ timeMillisDisplay(record.millisCost)[0] }}
-                  </span>
-                  <span style="float: right;">{{ timeMillisDisplay(record.millisCost)[1] }}</span>
-                </a-tooltip>
-              </span>
+              <time-cost :value="record.millisCost" />
             </template>
 
             <template v-else-if="column.key === 'repsonseInfoCode'">
@@ -176,10 +177,12 @@
 
 <script setup>
 import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
+import TimeCost from "@/components/TimeCost.vue"
+import FlowBytesShow from "@/components/FlowBytesShow.vue"
 import dayjs from "dayjs"
 import { onMounted, reactive, ref } from 'vue'
 import { DefaultPaginationConf } from "@/utils/bizConstants"
-import { colorForRequestTimeMillisCost, timeMillisDisplay, colorForResponseStatus } from "@/utils/formatter"
+import { colorForResponseStatus } from "@/utils/formatter"
 import { AccessLogService } from "@/services/accessLogService"
 import { EnvironmentService } from "@/services/environmentService"
 import { colorForHttpMethod, StatusCodeTreeData } from "@/utils/bizConstants"
@@ -263,6 +266,20 @@ const accessLogFields = [
     dataIndex: "reqTimeDisplay",
     width: '180px',
     minWidth: '180px',
+  },
+  {
+    title: "上行流量",
+    key: "flowUp",
+    dataIndex: ["requestInfo", "bodySize"],
+    width: '100px',
+    ellipsis: true,
+  },
+  {
+    title: "下行流量",
+    key: "flowDown",
+    dataIndex: ["responseInfo", "bodySize"],
+    width: '100px',
+    ellipsis: true,
   },
   {
     title: "请求耗时",
