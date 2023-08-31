@@ -20,6 +20,7 @@ const RoutePaths = {
     mkApi: "/mk/api",
     mkUserApp: "/mk/app",
     mkUserApply: "/mk/apply",
+    mkAccessLog: "/mk/access-log",
     mkLogin: "/mk/login",
     mkMyInfo: "/mk/my-info",
 }

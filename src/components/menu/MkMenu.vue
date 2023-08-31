@@ -15,6 +15,11 @@
       <span>我的申请</span>
     </a-menu-item>
 
+    <a-menu-item key="accessLog" @click="goToPage(RoutePaths.mkAccessLog)">
+      <snippets-outlined />
+      <span>访问日志</span>
+    </a-menu-item>
+
     <a-menu-item key="user" @click="goToPage(RoutePaths.mkMyInfo)">
       <user-outlined />
       <span>我的信息</span>
@@ -23,7 +28,7 @@
 </template>
 
 <script setup>
-import { AreaChartOutlined, AppstoreOutlined, UserOutlined, DeliveredProcedureOutlined } from '@ant-design/icons-vue'
+import { AreaChartOutlined, AppstoreOutlined, UserOutlined, DeliveredProcedureOutlined, SnippetsOutlined } from '@ant-design/icons-vue'
 import { RoutePaths } from "@/utils/pathConstants"
 import { useRouter } from "vue-router"
 

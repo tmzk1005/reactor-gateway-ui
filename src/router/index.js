@@ -86,6 +86,10 @@ const apiMarketRoutes = {
       component: () => import("@/views/mk/UserApply.vue")
     },
     {
+      path: RoutePaths.mkAccessLog,
+      component: () => import("@/views/common/AccessLog.vue")
+    },
+    {
       path: RoutePaths.mkMyInfo,
       component: () => import("@/views/common/MyInfo.vue")
     },

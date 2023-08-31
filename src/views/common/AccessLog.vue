@@ -185,6 +185,14 @@ import { EnvironmentService } from "@/services/environmentService"
 import { colorForHttpMethod, StatusCodeTreeData } from "@/utils/bizConstants"
 import { DownOutlined, UpOutlined } from '@ant-design/icons-vue'
 import { TreeSelect } from 'ant-design-vue'
+import { useRoute } from "vue-router"
+import { RoutePaths } from "@/utils/pathConstants"
+
+// -------------------- 模式 --------------------
+
+// 注意，是userRoute(),不是useRouter(),没有'r'
+const route = useRoute()
+const asSubscriber = route.path == RoutePaths.mkAccessLog
 
 // -------------------- 搜索条件 --------------------
 
@@ -272,7 +280,7 @@ const accessLogFields = [
 const paginationConf = reactive({ ...DefaultPaginationConf })
 
 const searchAccessLogs = (envId, pageNum, pageSize) => {
-  let params = {}
+  let params = { asSubscriber: asSubscriber }
   for (let pName in searchConditions) {
     if (searchConditions[pName]) {
       params[pName] = searchConditions[pName]
