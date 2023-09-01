@@ -201,9 +201,7 @@
                   <http-headers :headers="detailsToShow.requestInfo.headers" :key="'req' + detailsToShow.requestId" />
                 </a-descriptions-item>
                 <a-descriptions-item label="请求体">
-                  <div class="big-text-container">
-                    {{ detailsToShow.requestInfo.body }}
-                  </div>
+                  <highlightjs class="http-content" autodetect :code="detailsToShow.requestInfo.body" />
                 </a-descriptions-item>
               </a-descriptions>
             </a-page-header>
@@ -220,9 +218,7 @@
                   <http-headers :headers="detailsToShow.responseInfo.headers" :key="'resp' + detailsToShow.requestId" />
                 </a-descriptions-item>
                 <a-descriptions-item label="响应体">
-                  <div class="big-text-container">
-                    {{ detailsToShow.responseInfo.body }}
-                  </div>
+                  <highlightjs class="http-content" autodetect :code="detailsToShow.responseInfo.body" />
                 </a-descriptions-item>
               </a-descriptions>
             </a-page-header>
@@ -233,9 +229,7 @@
                 <a-descriptions :column="1" bordered :label-style="{ width: '100px', 'vertical-align': 'top' }"
                   v-for="keyName in detailsToShow.extraInfo" :key="`${detailsToShow.requestId}-${keyName}`">
                   <a-descriptions-item :label="keyName">
-                    <div class="big-text-container">
-                      <highlightjs language="json" :code="JSON.stringify(detailsToShow.extraInfo[keyName], null, 4)" />
-                    </div>
+                    <highlightjs class="http-content" autodetect :code="JSON.stringify(detailsToShow.extraInfo[keyName], null, 4)" />
                   </a-descriptions-item>
                 </a-descriptions>
               </div>
@@ -448,9 +442,17 @@ const showAccessLogDetail = (accessLog) => {
   box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.3);
 }
 
-.big-text-container {
+pre {
+  tab-size: 4;
+}
+
+.http-content {
   width: 100%;
-  max-height: 350px;
+  max-height: 500px;
   overflow: auto;
+  margin: 0;
+  padding: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 </style>

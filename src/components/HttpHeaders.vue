@@ -1,9 +1,9 @@
 <template>
   <div v-if="hasHeaders">
-    <pre class="headers-content">{{ text }}</pre>
+    <highlightjs autodetect :code="text" class="http-headers-content" />
   </div>
   <div v-else>
-    <pre class="headers-content" style="color:chocolate">未审计头信息</pre>
+    <pre class="http-headers-conten" style="color:chocolate">未审计头信息</pre>
   </div>
 </template>
 
@@ -32,7 +32,17 @@ const text = convertHeadersToText()
 </script>
 
 <style scoped>
-.headers-content {
+.http-headers-content {
+  width: 100%;
+  max-height: 500px;
+  overflow: auto;
   margin: 0;
+  padding: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+pre {
+  tab-size: 4;
 }
 </style>
