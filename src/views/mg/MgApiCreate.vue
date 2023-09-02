@@ -647,7 +647,11 @@ const submitCreateApiReq = () => {
       finalApiDto.routeDefinition.accessLogConf.bodyLimit = finalApiDto.routeDefinition.accessLogConf.bodyLimit * 1024
     }
     
-    finalApiDto.mdDoc = mdDocEditorRef.value.getContent()
+    if (mdDocEditorRef.value) {
+      finalApiDto.mdDoc = mdDocEditorRef.value.getContent()
+    } else {
+      finalApiDto.mdDoc = ""
+    }
 
     if (props.apiId) {
       // 编辑
