@@ -56,6 +56,10 @@ const ApiPaths = {
     gatewayNodes: "/gateway/nodes",
 
     accessLog: "/access-log",
+
+    dashboardApisCount: "/dashboard/apis-count",
+    dashboardApiCallsCount: "/dashboard/api-calls-count",
+    dasgboardApiCallsCountTrend: "/dashboard/api-calls-count-trend",
 }
 
 const RouteNames = {
