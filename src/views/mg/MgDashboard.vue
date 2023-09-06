@@ -41,6 +41,15 @@
           style="background-color: lightsteelblue; color: darkslategrey" />
       </a-col>
     </a-row>
+
+    <a-row type="flex" justify="center" :gutter="[20, 20]" style="height: 400px; padding-top: 20px;">
+      <a-col :span="24">
+        <line-chart class="chart" :title="trendOfCount.title" :x-axis-name="trendOfCount.xAxis.name"
+          :color="colorsForStatusCode" :y-axis-name="trendOfCount.yAxis.name" :x-axis-data="trendOfCount.xAxis.data"
+          :series="trendOfCount.series" />
+      </a-col>
+    </a-row>
+
   </a-layout>
 </template>
 
@@ -48,13 +57,23 @@
 import NumCard from "@/components/NumCard.vue"
 import { EnvironmentService } from "@/services/environmentService"
 import { DashboardService } from "@/services/dashboardService"
-import { ref, onMounted } from "vue"
+import { ref, reactive, onMounted } from "vue"
 
 const environmentOptions = ref([])
 const contextEnvId = ref('')
 
 const apisCount = ref(0)
 const apiCallsCount = ref({})
+
+const trendOfCount = reactive({
+  title: '',
+  xAxis: {},
+  yAxis: {},
+  series: []
+})
+
+// 颜色顺序不是乱排的，这个颜色用于显示请求数趋势图，颜色和状态码相关，正常响应偏绿色, 异常偏红色，中立偏蓝色
+const colorsForStatusCode = ['#5470c6', '#3ba272', '#ee6666', '#91cc75', '#fc8452', '#fac858', '#73c0de', '#9a60b4', '#ea7ccc']
 
 const getApisCount = () => {
   DashboardService.getApisCount(contextEnvId.value).then((data) => {
@@ -68,6 +87,15 @@ const getApiCallsCount = () => {
   })
 }
 
+const getApiCallsCountTrend = () => {
+  DashboardService.getApiCallsCountTrend(contextEnvId.value, null, null, "LAST_ONE_HOUR").then((data) => {
+    trendOfCount.title = data.title
+    trendOfCount.xAxis = data.xAxis
+    trendOfCount.yAxis = data.yAxis
+    trendOfCount.series = data.series
+  })
+}
+
 const envChanged = (envId) => {
   contextEnvId.value = envId
   initData()
@@ -76,6 +104,7 @@ const envChanged = (envId) => {
 const initData = () => {
   getApisCount()
   getApiCallsCount()
+  getApiCallsCountTrend()
 }
 
 onMounted(() => {
