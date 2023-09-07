@@ -152,7 +152,7 @@
             </template>
 
             <template v-else-if="column.key === 'flowUp'">
-              <flow-bytes-show :value="record.responseInfo.bodySize" />
+              <flow-bytes-show :value="record.requestInfo.bodySize" />
             </template>
 
             <template v-else-if="column.key === 'flowDown'">
