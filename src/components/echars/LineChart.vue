@@ -43,7 +43,7 @@ const initOption = () => {
       // orient: 'vertical',
       x: 'right',
       y: 'top',
-      padding: [10, 40, 0, 0]
+      padding: [10, 10, 0, 200]
     },
 
     xAxis: {

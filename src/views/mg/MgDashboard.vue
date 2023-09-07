@@ -42,11 +42,38 @@
       </a-col>
     </a-row>
 
-    <a-row type="flex" justify="center" :gutter="[20, 20]" style="height: 400px; padding-top: 20px;">
+    <a-divider />
+
+    <a-row type="flex" justify="center" style="padding-top: 20px;">
       <a-col :span="24">
+        <div style="vertical-align: bottom;">
+          <span style="font-size: 1.2rem; font-weight: 700;">API调用统计</span>
+          <span style="font-size: 1rem; font-weight: normal; margin-left: 30px;">
+            <a-radio-group v-model:value="timeRangeType" size="small" @change="getApiCallsCountTrend">
+              <a-radio-button value="LAST_ONE_HOUR">最近1小时</a-radio-button>
+              <a-radio-button value="LAST_DAY">最近24小时</a-radio-button>
+              <a-radio-button value="LAST_MONTH">最近1月</a-radio-button>
+            </a-radio-group>
+          </span>
+        </div>
+      </a-col>
+    </a-row>
+
+    <a-row type="flex" justify="center" :gutter="[20, 20]" style="height: 400px; padding-top: 20px;">
+      <a-col :span="8">
         <line-chart class="chart" :title="trendOfCount.title" :x-axis-name="trendOfCount.xAxis.name"
           :color="colorsForStatusCode" :y-axis-name="trendOfCount.yAxis.name" :x-axis-data="trendOfCount.xAxis.data"
           :series="trendOfCount.series" />
+      </a-col>
+
+      <a-col :span="8">
+        <line-chart class="chart" :title="trendOfDelay.title" :x-axis-name="trendOfDelay.xAxis.name"
+          :y-axis-name="trendOfDelay.yAxis.name" :x-axis-data="trendOfDelay.xAxis.data" :series="trendOfDelay.series" />
+      </a-col>
+
+      <a-col :span="8">
+        <line-chart class="chart" :title="trendOfFlow.title" :x-axis-name="trendOfFlow.xAxis.name"
+          :y-axis-name="trendOfFlow.yAxis.name" :x-axis-data="trendOfFlow.xAxis.data" :series="trendOfFlow.series" />
       </a-col>
     </a-row>
 
@@ -61,11 +88,26 @@ import { ref, reactive, onMounted } from "vue"
 
 const environmentOptions = ref([])
 const contextEnvId = ref('')
+const timeRangeType = ref('LAST_ONE_HOUR')
 
 const apisCount = ref(0)
 const apiCallsCount = ref({})
 
 const trendOfCount = reactive({
+  title: '',
+  xAxis: {},
+  yAxis: {},
+  series: []
+})
+
+const trendOfDelay = reactive({
+  title: '',
+  xAxis: {},
+  yAxis: {},
+  series: []
+})
+
+const trendOfFlow = reactive({
   title: '',
   xAxis: {},
   yAxis: {},
@@ -88,11 +130,21 @@ const getApiCallsCount = () => {
 }
 
 const getApiCallsCountTrend = () => {
-  DashboardService.getApiCallsCountTrend(contextEnvId.value, null, null, "LAST_ONE_HOUR").then((data) => {
-    trendOfCount.title = data.title
-    trendOfCount.xAxis = data.xAxis
-    trendOfCount.yAxis = data.yAxis
-    trendOfCount.series = data.series
+  DashboardService.getApiCallsCountTrend(contextEnvId.value, null, null, timeRangeType.value).then((data) => {
+    trendOfCount.title = data.apiCallsCountTrend.title
+    trendOfCount.xAxis = data.apiCallsCountTrend.xAxis
+    trendOfCount.yAxis = data.apiCallsCountTrend.yAxis
+    trendOfCount.series = data.apiCallsCountTrend.series
+
+    trendOfDelay.title = data.apiCallsDelayTrend.title
+    trendOfDelay.xAxis = data.apiCallsDelayTrend.xAxis
+    trendOfDelay.yAxis = data.apiCallsDelayTrend.yAxis
+    trendOfDelay.series = data.apiCallsDelayTrend.series
+
+    trendOfFlow.title = data.apiCallsFlowTrend.title
+    trendOfFlow.xAxis = data.apiCallsFlowTrend.xAxis
+    trendOfFlow.yAxis = data.apiCallsFlowTrend.yAxis
+    trendOfFlow.series = data.apiCallsFlowTrend.series
   })
 }
 
