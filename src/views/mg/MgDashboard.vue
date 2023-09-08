@@ -50,7 +50,7 @@
           <span style="font-size: 1.2rem; font-weight: 700;">API调用统计</span>
           <span style="font-size: 1rem; font-weight: normal; margin-left: 30px;">
             <a-radio-group v-model:value="timeRangeType" size="small" @change="getApiCallsCountTrend">
-              <a-radio-button value="LAST_ONE_HOUR">最近1小时</a-radio-button>
+              <a-radio-button value="LAST_HOUR">最近1小时</a-radio-button>
               <a-radio-button value="LAST_DAY">最近24小时</a-radio-button>
               <a-radio-button value="LAST_MONTH">最近1月</a-radio-button>
             </a-radio-group>
@@ -88,7 +88,7 @@ import { ref, reactive, onMounted } from "vue"
 
 const environmentOptions = ref([])
 const contextEnvId = ref('')
-const timeRangeType = ref('LAST_ONE_HOUR')
+const timeRangeType = ref('LAST_HOUR')
 
 const apisCount = ref(0)
 const apiCallsCount = ref({})
