@@ -83,7 +83,7 @@
               <p>{{ pluginToShow.description }}</p>
             </a-page-header>
 
-            <a-page-header style="border: 1px solid rgb(235, 237, 240); margin-top: 20px;" title="配置 Json Scema">
+            <a-page-header style="border: 1px solid rgb(235, 237, 240); margin-top: 20px;" title="配置 Json Schema">
               <div>
                 <highlightjs language="json" :code="JSON.stringify(JSON.parse(pluginToShow.jsonSchema), null, 4)" />
               </div>
