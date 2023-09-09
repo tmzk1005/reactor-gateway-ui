@@ -10,6 +10,10 @@
             <span class="section-level-1">API基本信息</span>
           </template>
 
+          <template #extra>
+            <a-button type="primary" @click="editApi(api.id)">修改</a-button>
+          </template>
+
           <a-descriptions bordered :column="2" :label-style="labelStyle">
             <a-descriptions-item label="名称">
               <span style="font-weight: 700;">
@@ -229,12 +233,15 @@
 
 <script setup>
 import { nextTick, ref, h } from 'vue'
-import { RoutePaths } from '@/utils/pathConstants'
+import { RouteNames, RoutePaths } from '@/utils/pathConstants'
 import { ApiService } from "@/services/apiService"
 import { colorForHttpMethod } from "@/utils/bizConstants"
 import { newInstance, StraightConnector, BlankEndpoint } from "@jsplumb/browser-ui"
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { notification } from "ant-design-vue"
+import { useRouter } from "vue-router"
+
+const router = useRouter()
 
 const props = defineProps({
   apiId: String
@@ -337,6 +344,13 @@ const unpublishApi = (apiId, envId) => {
   ApiService.unpublishApi(apiId, envId).then(() => {
     notification.success({ message: "下线API成功" })
     apiInfoMayUpdated()
+  })
+}
+
+const editApi = (apiId) => {
+  router.push({
+    name: RouteNames.mgApiUpdate,
+    params: { apiId: apiId }
   })
 }
 
