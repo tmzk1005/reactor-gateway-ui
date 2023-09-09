@@ -29,3 +29,4 @@ coverage
 
 # gradle
 .gradle/
+build/
