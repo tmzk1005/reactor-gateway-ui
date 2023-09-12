@@ -17,6 +17,8 @@
     "ant-design-vue": "^4.0.0",
     "axios": "^1.4.0",
     "echarts": "^5.4.3",
+    "marked": "^9.0.0",
+    "marked-highlight": "^2.0.6",
     "pinia": "^2.1.4",
     "qs": "^6.11.2",
     "vue": "^3.3.4",
