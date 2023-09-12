@@ -90,9 +90,7 @@
             </a-page-header>
 
             <a-page-header style="border: 1px solid rgb(235, 237, 240); margin-top: 20px" title="文档">
-              <p>
-                {{ pluginToShow.mdDoc }}
-              </p>
+              <div class="markdown-doc-container" v-if="pluginToShow.mdDoc" v-html="markdownHtml"></div>
             </a-page-header>
           </div>
         </a-modal>
@@ -107,6 +105,23 @@ import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
 import { QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { PluginService } from '@/services/pluginService'
+import { computed } from 'vue'
+
+import { Marked } from "marked"
+import { markedHighlight } from "marked-highlight"
+import hljs from 'highlight.js'
+
+// -----------------------------------
+
+const marked = new Marked(
+  markedHighlight({
+    langPrefix: 'hljs language-',
+    highlight(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+      return hljs.highlight(code, { language }).value
+    }
+  })
+)
 
 // -----------------------------------
 
@@ -190,6 +205,8 @@ const pluginToShow = reactive({
   mdDoc: "",
 })
 
+const markdownHtml = computed(() => marked.parse(pluginToShow.mdDoc))
+
 const showDetailOfOnePlugin = (record) => {
   Object.assign(pluginToShow, record)
   pluginDetailModalVisible.value = true
@@ -212,3 +229,12 @@ onUnmounted(() => {
 // -----------------------------------
 
 </script>
+
+<style scoped>
+.markdown-doc-container {
+  background-color: #fdfdfd;
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
+  transform: translateZ(-10px);
+  padding: 10px 20px;
+}
+</style>

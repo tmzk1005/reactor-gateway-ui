@@ -1,6 +1,5 @@
 import { HttpClient } from "@/utils/http"
 import { ApiPaths } from "@/utils/pathConstants"
-import { time } from "echarts"
 
 const getApisCount = async (envId, orgId) => {
   let params = { envId: envId, orgId: orgId }
