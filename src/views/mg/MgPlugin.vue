@@ -32,8 +32,8 @@
             </template>
 
             <template v-if="column.dataIndex === 'builtin'">
-              <a-tag :color="computeInstallType(record).color">
-                {{ computeInstallType(record).text }}
+              <a-tag :color="computePluginInstallType(record).color">
+                {{ computePluginInstallType(record).text }}
               </a-tag>
             </template>
 
@@ -50,49 +50,8 @@
 
     <a-row type="flex" justify="center">
       <a-col :span="24">
-        <a-modal class="plugin-detail-modal" width="80%" v-model:open="pluginDetailModalVisible" title="插件详情"
-          :footer="null">
-          <div style="overflow-y: auto; height: calc(100vh - 350px);" class="plugin-detail-container">
-            <a-page-header style="border: 1px solid rgb(235, 237, 240); margin-top: 10px;" title="基本信息">
-
-              <a-descriptions bordered :column="3">
-                <a-descriptions-item label="名称"><span style="font-weight: 700;">{{ pluginToShow.name
-                }}</span></a-descriptions-item>
-                <a-descriptions-item label="版本">{{ pluginToShow.version }}</a-descriptions-item>
-                <a-descriptions-item label="ID">{{ pluginToShow.id }}</a-descriptions-item>
-                <a-descriptions-item label="实现类名" :span="3">{{ pluginToShow.fullClassName }}</a-descriptions-item>
-                <a-descriptions-item label="安装类型" :span="3">
-                  <a-tag :color="computeInstallType(pluginToShow).color">
-                    {{ computeInstallType(pluginToShow).text }}
-                  </a-tag>
-                </a-descriptions-item>
-                <a-descriptions-item label="必须置尾" :span="3">
-                  <a-tag :color="pluginToShow.tail ? 'green' : 'gray'">
-                    {{ pluginToShow.tail ? '是' : '否' }}
-                  </a-tag>
-                </a-descriptions-item>
-                <a-descriptions-item label="所属组织" :span="3"
-                  v-if="!pluginToShow.builtin && pluginToShow.organizationId != null">
-                  {{ pluginToShow.organizationName }}
-                </a-descriptions-item>
-              </a-descriptions>
-
-            </a-page-header>
-
-            <a-page-header style="border: 1px solid rgb(235, 237, 240); margin-top: 20px" title="功能简介">
-              <p>{{ pluginToShow.description }}</p>
-            </a-page-header>
-
-            <a-page-header style="border: 1px solid rgb(235, 237, 240); margin-top: 20px;" title="配置 Json Schema">
-              <div>
-                <highlightjs language="json" :code="JSON.stringify(JSON.parse(pluginToShow.jsonSchema), null, 4)" />
-              </div>
-            </a-page-header>
-
-            <a-page-header style="border: 1px solid rgb(235, 237, 240); margin-top: 20px" title="文档">
-              <div class="markdown-doc-container" v-if="pluginToShow.mdDoc" v-html="markdownHtml"></div>
-            </a-page-header>
-          </div>
+        <a-modal width="80%" v-model:open="pluginDetailModalVisible" title="插件详情" :footer="null">
+          <plugin-detail-display :plugin="pluginToShow" :key="pluginToShow.id" />
         </a-modal>
       </a-col>
     </a-row>
@@ -102,26 +61,11 @@
 
 <script setup>
 import RgwBreadcrumb from "@/components/RgwBreadcrumb.vue"
+import PluginDetailDisplay from "@/components/api/PluginDetailDisplay.vue"
 import { QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { PluginService } from '@/services/pluginService'
-import { computed } from 'vue'
-
-import { Marked } from "marked"
-import { markedHighlight } from "marked-highlight"
-import hljs from 'highlight.js'
-
-// -----------------------------------
-
-const marked = new Marked(
-  markedHighlight({
-    langPrefix: 'hljs language-',
-    highlight(code, lang) {
-      const language = hljs.getLanguage(lang) ? lang : 'plaintext'
-      return hljs.highlight(code, { language }).value
-    }
-  })
-)
+import { computePluginInstallType }  from "@/utils/bizConstants"
 
 // -----------------------------------
 
@@ -163,24 +107,6 @@ const pluginTableScroll = reactive({
 
 const pluginList = ref([])
 
-const computeInstallType = (item) => {
-  let result = {
-    text: "",
-    color: ""
-  }
-  if (item.builtin) {
-    result.text = "内置"
-    result.color = "green"
-  } else if (item.organizationId == null || item.organizationId == undefined || item.organizationId == "") {
-    result.text = "自定义-共享"
-    result.color = "blue"
-  } else {
-    result.text = "自定义-组织私有"
-    result.color = "orange"
-  }
-  return result
-}
-
 const loadAllPlugins = () => {
   PluginService.getAllPlugins().then((data) => {
     pluginList.value = data
@@ -191,24 +117,10 @@ loadAllPlugins()
 // -----------------------------------
 
 const pluginDetailModalVisible = ref(false)
-const pluginToShow = reactive({
-  id: "",
-  name: "",
-  fullClassName: "",
-  version: "",
-  jsonSchema: "",
-  organizationId: "",
-  organizationName: "",
-  builtin: true,
-  tail: false,
-  description: "",
-  mdDoc: "",
-})
-
-const markdownHtml = computed(() => marked.parse(pluginToShow.mdDoc))
+const pluginToShow = ref({})
 
 const showDetailOfOnePlugin = (record) => {
-  Object.assign(pluginToShow, record)
+  Object.assign(pluginToShow.value, record)
   pluginDetailModalVisible.value = true
 }
 
@@ -225,7 +137,5 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', windowResizeListener)
 })
-
-// -----------------------------------
 
 </script>

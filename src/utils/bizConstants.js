@@ -113,4 +113,25 @@ const createStatusCodeTreeData = () => {
 }
 const StatusCodeTreeData = createStatusCodeTreeData()
 
-export { Role, RoleSelectOptions, DefaultPaginationConf, colorForHttpMethod, userBaseInfoFormCheckRule, StatusCodeTreeData }
+const computePluginInstallType = (item) => {
+  let result = {
+    text: "",
+    color: ""
+  }
+  if (item.builtin) {
+    result.text = "内置"
+    result.color = "green"
+  } else if (item.organizationId == null || item.organizationId == undefined || item.organizationId == "") {
+    result.text = "自定义-共享"
+    result.color = "blue"
+  } else {
+    result.text = "自定义-组织私有"
+    result.color = "orange"
+  }
+  return result
+}
+
+export {
+  Role, RoleSelectOptions, DefaultPaginationConf, colorForHttpMethod,
+  userBaseInfoFormCheckRule, StatusCodeTreeData, computePluginInstallType
+}
