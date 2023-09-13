@@ -67,12 +67,14 @@
 
     <a-row style="padding-top: 20px;">
       <a-col :span="24">
-        <a-page-header title="API处理流程" style="font-family: monospace; ">
+        <a-page-header title="API处理流程" style="font-family: monospace;"
+          sub-title="拖拽左边的插件框到右边来选择要使用的插件，之后在右边可以通过拖拽对插件进行排序，深色插件必须且只能选择1个，且必须放在最后，双击插件框查看对应插件的详细说明以及文档">
+
           <div class="api-create-container">
             <div class="api-create-left">
               <!-- zone 1 -->
               <api-plugin v-for="plugin in zone1Plugins" :data="plugin" :key="plugin.id" v-show="!plugin.used"
-                :draggable="plugin.draggable && (!plugin.tail || !zone2HasTail)"
+                @dblclick="showDetailOfOnePlugin(plugin)" :draggable="plugin.draggable && (!plugin.tail || !zone2HasTail)"
                 @dragstart="dragFromZone1ToZone2Start(plugin)" @dragend="dragFromZone1ToZone2End($event)">
               </api-plugin>
             </div>
@@ -82,7 +84,7 @@
               <!-- zone 2 -->
               <api-plugin-instance v-for="plugin in zone2Plugins" :data="plugin" :key="plugin.id"
                 :style="{ border: plugin.temporary ? 'dashed' : '' }" :draggable="plugin.draggable && !plugin.tail"
-                @dblclick="configPlugin(plugin)" @dragstart="dragFromZone2ToZone2Start(plugin)"
+                @dblclick="showDetailOfOnePlugin(plugin)" @dragstart="dragFromZone2ToZone2Start(plugin)"
                 @dragend="dragFromZone2ToZone2End($event)" @dragenter="zone2PluginDragEnter($event, plugin)"
                 @dragover="zone2PluginDragOver($event)" @dragleave="zone2PluginDragLeave($event)"
                 @drop="zone2PluginDragDrop($event)">
@@ -178,6 +180,14 @@
           <template #footer>
             <a-button type="primary" @click="advanceConfDialogVisible = false">保存</a-button>
           </template>
+        </a-modal>
+      </a-col>
+    </a-row>
+
+    <a-row type="flex" justify="center">
+      <a-col :span="24">
+        <a-modal width="80%" v-model:open="pluginDetailModalVisible" title="插件详情" :footer="null">
+          <plugin-detail-display :plugin="pluginToShow" :key="pluginToShow.id" />
         </a-modal>
       </a-col>
     </a-row>
@@ -291,6 +301,12 @@ const createZone2PluginByZone1Plugin = (zone1Plugin) => {
     jsonDefault: zone1Plugin.jsonDefault,
     jsonConf: zone1Plugin.jsonDefault,
     tail: zone1Plugin.tail,
+
+    jsonSchema: zone1Plugin.jsonSchema,
+    mdDoc: zone1Plugin.mdDoc,
+    organizationId: zone1Plugin.organizationId,
+    organizationName: zone1Plugin.organizationName,
+
     draggable: false,
     temporary: true,
   }
@@ -646,7 +662,7 @@ const submitCreateApiReq = () => {
       // KB转字节数
       finalApiDto.routeDefinition.accessLogConf.bodyLimit = finalApiDto.routeDefinition.accessLogConf.bodyLimit * 1024
     }
-    
+
     if (mdDocEditorRef.value) {
       finalApiDto.mdDoc = mdDocEditorRef.value.getContent()
     } else {
@@ -673,6 +689,16 @@ const submitCreateApiReq = () => {
       })
     }
   })
+}
+
+// -------------------- 插件详情 --------------------
+
+const pluginDetailModalVisible = ref(false)
+const pluginToShow = ref({})
+
+const showDetailOfOnePlugin = (record) => {
+  Object.assign(pluginToShow.value, record)
+  pluginDetailModalVisible.value = true
 }
 
 </script>
