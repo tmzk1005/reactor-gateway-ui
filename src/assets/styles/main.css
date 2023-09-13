@@ -39,3 +39,27 @@ div,
 span {
   font-family: monospace;
 }
+
+.markdown-doc-container {
+  background-color: #fdfdfd;
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
+  transform: translateZ(-5px);
+  padding: 10px 20px;
+}
+
+.markdown-doc-container p>code {
+  padding-left: 5px;
+  padding-right: 5px;
+  background-color: aliceblue;
+  color: green;
+}
+
+.markdown-doc-container p>strong {
+  color: blueviolet;
+  font-weight: 900;
+}
+
+.markdown-doc-container pre>code.hljs {
+  border: 1px solid;
+  background-color: aliceblue;
+}

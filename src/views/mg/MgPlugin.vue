@@ -229,12 +229,3 @@ onUnmounted(() => {
 // -----------------------------------
 
 </script>
-
-<style scoped>
-.markdown-doc-container {
-  background-color: #fdfdfd;
-  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
-  transform: translateZ(-10px);
-  padding: 10px 20px;
-}
-</style>
