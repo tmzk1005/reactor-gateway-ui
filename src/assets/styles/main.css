@@ -63,3 +63,8 @@ span {
   border: 1px solid;
   background-color: aliceblue;
 }
+
+.markdown-doc-container blockquote {
+  background-color: antiquewhite;
+  font-style: italic;
+}
