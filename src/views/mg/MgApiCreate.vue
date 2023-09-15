@@ -146,7 +146,7 @@
                   <a-switch v-model:checked="apiAdvanceConf.accessLogEnabled" checked-children="开"
                     un-checked-children="关" />
                 </a-form-item>
-                <a-form-item label="审计选项">
+                <a-form-item label="审计选项" v-show="apiAdvanceConf.accessLogEnabled">
                   <a-checkbox v-model:checked="apiAdvanceConf.accessLogConf.reqHeadersEnabled"
                     :disabled="!apiAdvanceConf.accessLogEnabled">请求头</a-checkbox>
                   <a-checkbox v-model:checked="apiAdvanceConf.accessLogConf.reqBodyEnabled"
@@ -156,7 +156,7 @@
                   <a-checkbox v-model:checked="apiAdvanceConf.accessLogConf.respBodyEnabled"
                     :disabled="!apiAdvanceConf.accessLogEnabled">响应体</a-checkbox>
                 </a-form-item>
-                <a-form-item label="审计报文大小上限">
+                <a-form-item label="审计报文大小上限" v-show="apiAdvanceConf.accessLogEnabled">
                   <a-tooltip placement="topLeft" arrow-point-at-center
                     title="最大允许设置为1MB，即1024KB。审计请求体和响应体比较消耗网关组件的内存，会影响网关的性能，当请求体和响应体的大小超过设置的上限大小时，不会审计。">
                     <a-input-number v-model:value="apiAdvanceConf.accessLogConf.bodyLimit" addon-after="KB"
@@ -170,6 +170,29 @@
               </a-form>
             </div>
           </a-page-header>
+
+          <a-page-header title="APP认证" sub-title="开启APP认证后，API需要使用APP订阅后才能调用，且可以支持请求防篡改" style="font-family: monospace;">
+            <div class="advance-conf-section">
+              <a-form :model="apiAdvanceConf" :labelCol="{ span: 4 }" :wrapperCol="{ span: 8 }">
+                <a-form-item label="是否开启APP认证">
+                  <a-tooltip placement="topLeft" arrow-point-at-center
+                    title="开启APP认证后，客户端需要使用SDK来计算认证Hash，详细说明参考相关文档。">
+                    <a-switch v-model:checked="apiAdvanceConf.appAuthConf.enabled" checked-children="开"
+                      un-checked-children="关" />
+                  </a-tooltip>
+
+                </a-form-item>
+                <a-form-item label="是否开启请求体防篡改" v-show="apiAdvanceConf.appAuthConf.enabled">
+                  <a-tooltip placement="topLeft" arrow-point-at-center
+                    title="请求体防篡改需要缓存请求体到内存来计算sha256哈希值，比较消耗内存，对网关性能影响比较大，建议只对重要请求，且请求体不超过8KB时开启。">
+                    <a-switch v-model:checked="apiAdvanceConf.appAuthConf.bodyTamperProofingEnabled"
+                      :disabled="!apiAdvanceConf.appAuthConf.enabled" checked-children="开" un-checked-children="关" />
+                  </a-tooltip>
+                </a-form-item>
+              </a-form>
+            </div>
+          </a-page-header>
+
 
           <a-page-header title="文档" sub-title="使用markdown编写API文档" style="font-family: monospace; padding-top: 10px;">
             <div class="markdown-container">
@@ -245,8 +268,11 @@ const initForUpdate = () => {
       zone2Plugins.value.push(plInZone2)
     }
 
-    let accessLogConf = data.routeDefinition.accessLogConf
+    if (data.routeDefinition.appAuthConf) {
+      apiAdvanceConf.appAuthConf = data.routeDefinition.appAuthConf
+    }
 
+    let accessLogConf = data.routeDefinition.accessLogConf
     if (accessLogConf) {
       apiAdvanceConf.accessLogEnabled = true
       apiAdvanceConf.accessLogConf = { ...accessLogConf }
@@ -553,6 +579,10 @@ const apiAdvanceConf = reactive({
     respBodyEnabled: false,
     bodyLimit: 8,
   },
+  appAuthConf: {
+    enabled: false,
+    bodyTamperProofingEnabled: false
+  },
   mdDoc: "",
 })
 
@@ -643,6 +673,7 @@ const submitCreateApiReq = () => {
         path: apiDto.path,
         methods: apiDto.methods,
         accessLogConf: null,
+        appAuthConf: null,
         pluginDefinitions: []
       }
     }
@@ -662,6 +693,8 @@ const submitCreateApiReq = () => {
       // KB转字节数
       finalApiDto.routeDefinition.accessLogConf.bodyLimit = finalApiDto.routeDefinition.accessLogConf.bodyLimit * 1024
     }
+
+    finalApiDto.routeDefinition.appAuthConf = { ...apiAdvanceConf.appAuthConf }
 
     if (mdDocEditorRef.value) {
       finalApiDto.mdDoc = mdDocEditorRef.value.getContent()
