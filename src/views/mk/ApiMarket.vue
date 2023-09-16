@@ -22,7 +22,7 @@
           <a-typography-title class="api-title" :level="4">{{ releasedApi.name }}</a-typography-title>
         </template>
         <template #actions>
-          <span>
+          <span v-show="releasedApi.appAuthEnabled">
             <a-button type="link" @click="applyApi(releasedApi)">
               <template #icon>
                 <EyeOutlined />
