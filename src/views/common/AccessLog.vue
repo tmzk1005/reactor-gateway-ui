@@ -169,6 +169,12 @@
               </a-tag>
             </template>
 
+            <template v-else-if="column.dataIndex === 'tags'">
+              <a-tag v-for="tag in record.tags" v-bind:key="tag" color="blue">
+                {{ tag }}
+              </a-tag>
+            </template>
+
             <template v-else-if="column.dataIndex == 'requestId'">
               <a-tooltip placement="topLeft" color="blue" title="点击查看详细日志">
                 <a-button type="link" style="padding: 0;" @click="showAccessLogDetail(record)">
@@ -331,7 +337,7 @@ const accessLogFields = [
   {
     title: "API名称",
     dataIndex: "apiName",
-    width: '200px',
+    width: '150px',
     ellipsis: true,
   },
   {
@@ -341,9 +347,15 @@ const accessLogFields = [
     width: '80px',
   },
   {
-    title: "请求路径",
-    dataIndex: ["requestInfo", "uri"],
-    ellipsis: true,
+    title: "响应状态码",
+    key: 'repsonseInfoCode',
+    dataIndex: ["responseInfo", "code"],
+    width: '100px',
+  },
+  {
+    title: "请求耗时",
+    dataIndex: "millisCost",
+    width: '100px',
   },
   {
     title: "客户端IP",
@@ -354,7 +366,7 @@ const accessLogFields = [
   {
     title: "客户端应用名称",
     dataIndex: "clientAppName",
-    width: '180px',
+    width: '150px',
     ellipsis: true,
   },
   {
@@ -378,15 +390,15 @@ const accessLogFields = [
     ellipsis: true,
   },
   {
-    title: "请求耗时",
-    dataIndex: "millisCost",
-    width: '100px',
+    title: "请求路径",
+    dataIndex: ["requestInfo", "uri"],
+    ellipsis: true,
   },
   {
-    title: "响应状态码",
-    key: 'repsonseInfoCode',
-    dataIndex: ["responseInfo", "code"],
-    width: '100px',
+    title: "标签",
+    key: 'tags',
+    dataIndex: 'tags',
+    ellipsis: true,
   },
 ]
 
