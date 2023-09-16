@@ -5,6 +5,11 @@
     <a-row type="flex" justify="center">
       <a-col :span="24">
         <a-page-header title="插件" style="font-family: monospace;">
+          <template #extra>
+            <a-tooltip placement="topLeft" arrow-point-at-center title="安装自定义插件暂未实现">
+              <a-button type="primary">安装</a-button>
+            </a-tooltip>
+          </template>
         </a-page-header>
       </a-col>
     </a-row>
@@ -65,7 +70,7 @@ import PluginDetailDisplay from "@/components/api/PluginDetailDisplay.vue"
 import { QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { onMounted, onUnmounted, reactive, ref } from 'vue'
 import { PluginService } from '@/services/pluginService'
-import { computePluginInstallType }  from "@/utils/bizConstants"
+import { computePluginInstallType } from "@/utils/bizConstants"
 
 // -----------------------------------
 
