@@ -223,13 +223,27 @@
               </a-descriptions>
             </a-page-header>
 
+            <a-page-header class="section-container" title="标签">
+              <div v-if="detailsToShow.tags && detailsToShow.tags.length > 0">
+                <span>
+                  <a-tag v-for="tag in detailsToShow.tags" v-bind:key="tag" color="blue">
+                    {{ tag }}
+                  </a-tag>
+                </span>
+              </div>
+              <div v-else>
+                <span style="color: chocolate;">无标签</span>
+              </div>
+            </a-page-header>
+
             <a-page-header class="section-container" title="扩展信息">
               <div v-if="detailsToShow.extraInfo && Object.getOwnPropertyNames(detailsToShow.extraInfo).length > 0"
                 class="big-text-container">
                 <a-descriptions :column="1" bordered :label-style="{ width: '100px', 'vertical-align': 'top' }"
                   v-for="keyName in detailsToShow.extraInfo" :key="`${detailsToShow.requestId}-${keyName}`">
                   <a-descriptions-item :label="keyName">
-                    <highlightjs class="http-content" autodetect :code="JSON.stringify(detailsToShow.extraInfo[keyName], null, 4)" />
+                    <highlightjs class="http-content" autodetect
+                      :code="JSON.stringify(detailsToShow.extraInfo[keyName], null, 4)" />
                   </a-descriptions-item>
                 </a-descriptions>
               </div>
