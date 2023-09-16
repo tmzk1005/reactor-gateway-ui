@@ -1,7 +1,7 @@
 <template>
   <a-row style="margin-top: 150px">
     <a-col :offset="2" :span="6">
-      <span style="font-size: 2rem; float: right">登录</span>
+      <span style="font-size: 2rem; float: right">Dashboard-登录</span>
     </a-col>
   </a-row>
   <a-row>

@@ -57,7 +57,7 @@ const router = useRouter()
 
 const onLogout = function () {
   UserService.logout().then(() => {
-    router.push(RoutePaths.mgLogin)
+    router.push(RoutePaths.mkLogin)
   })
 }
 
