@@ -104,9 +104,19 @@
 
                     <template #extra>
 
+                      <a-tooltip placement="topLeft" arrow-point-at-center title="点击查看API的高级配置"
+                        v-if="snapshot.publishStatus != 'UNPUBLISHED'">
+                        <a-button type="link" @click="showAdvanceConf(snapshot)">高级配置</a-button>
+                      </a-tooltip>
+
+                      <a-tooltip placement="topLeft" arrow-point-at-center title="点击查看API的历史调用情况">
+                        <a-button type="link">历史调用</a-button>
+                      </a-tooltip>
+
                       <a-popconfirm :title="`确认从${snapshot.env.name}下线API吗?`" ok-text="确认" cancel-text="取消"
                         v-if="snapshot.publishStatus != 'UNPUBLISHED'" @confirm="unpublishApi(api.id, snapshot.env.id)">
-                        <a-button type="primary" danger :icon="h(DownloadOutlined)">{{ `下线[${snapshot.env.name}]` }}</a-button>
+                        <a-button type="primary" danger :icon="h(DownloadOutlined)">{{ `下线[${snapshot.env.name}]`
+                        }}</a-button>
                       </a-popconfirm>
 
                       <a-popconfirm :title="`确认发布API到${snapshot.env.name}吗?`" ok-text="确认" cancel-text="取消"
@@ -228,11 +238,73 @@
         </a-page-header>
       </a-col>
     </a-row>
+
+    <a-row type="flex" justify="center">
+      <a-col :span="24">
+        <a-modal width="80%" title="高级配置" :footer="null" v-model:open="advanceConfDialogVisiable">
+          <a-page-header class="section-container">
+            <template #title>
+              <span class="section-level-2">访问日志配置</span>
+            </template>
+            <a-descriptions bordered size="small" :column="2" :label-style="labelStyle">
+              <a-descriptions-item label="开启" :span="2">
+                <span>
+                  {{ advanceConf.accessLogConf != null ? '是' : '否' }}
+                </span>
+              </a-descriptions-item>
+              <a-descriptions-item label="请求头" v-if="advanceConf.accessLogConf != null">
+                <span>
+                  {{ advanceConf.accessLogConf.reqHeadersEnabled ? '是' : '否' }}
+                </span>
+              </a-descriptions-item>
+              <a-descriptions-item label="请求体" v-if="advanceConf.accessLogConf != null">
+                <span>
+                  {{ advanceConf.accessLogConf.reqBodyEnabled ? '是' : '否' }}
+                </span>
+              </a-descriptions-item>
+              <a-descriptions-item label="响应头" v-if="advanceConf.accessLogConf != null">
+                <span>
+                  {{ advanceConf.accessLogConf.respHeadersEnabled ? '是' : '否' }}
+                </span>
+              </a-descriptions-item>
+              <a-descriptions-item label="响应体" v-if="advanceConf.accessLogConf != null">
+                <span>
+                  {{ advanceConf.accessLogConf.respBodyEnabled ? '是' : '否' }}
+                </span>
+              </a-descriptions-item>
+              <a-descriptions-item label="大小上限" v-if="advanceConf.accessLogConf != null">
+                <span>
+                  {{ advanceConf.accessLogConf.bodyLimit }} 字节
+                </span>
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-page-header>
+
+          <a-page-header class="section-container">
+            <template #title>
+              <span class="section-level-2">APP认证配置</span>
+            </template>
+            <a-descriptions bordered size="small" :column="2" :label-style="labelStyle">
+              <a-descriptions-item label="开启">
+                <span>
+                  {{ advanceConf.appAuthConf.enabled ? '是' : '否' }}
+                </span>
+              </a-descriptions-item>
+              <a-descriptions-item label="请求体防篡改" v-if="advanceConf.appAuthConf.enabled">
+                <span>
+                  {{ advanceConf.appAuthConf.bodyTamperProofingEnabled ? '是' : '否' }}
+                </span>
+              </a-descriptions-item>
+            </a-descriptions>
+          </a-page-header>
+        </a-modal>
+      </a-col>
+    </a-row>
   </a-layout>
 </template>
 
 <script setup>
-import { nextTick, ref, h } from 'vue'
+import { nextTick, ref, h, reactive } from 'vue'
 import { RouteNames, RoutePaths } from '@/utils/pathConstants'
 import { ApiService } from "@/services/apiService"
 import { colorForHttpMethod } from "@/utils/bizConstants"
@@ -321,6 +393,32 @@ const tabChanged = (key) => {
       )
     }
   })
+}
+
+const advanceConfDialogVisiable = ref(false)
+const advanceConf = reactive({
+  accessLogConf: null,
+  appAuthConf: {
+    enabled: false,
+    bodyTamperProofingEnabled: false,
+  }
+})
+const showAdvanceConf = (snapshot) => {
+  // console.log("show advance conf", snapshot)
+  if (snapshot.routeDefinition.accessLogConf) {
+    advanceConf.accessLogConf = { ...snapshot.routeDefinition.accessLogConf }
+  } else {
+    advanceConf.accessLogConf = null
+  }
+  if (snapshot.routeDefinition.appAuthConf) {
+    advanceConf.appAuthConf = { ...snapshot.routeDefinition.appAuthConf }
+  } else {
+    advanceConf.appAuthConf = {
+      enabled: false,
+      bodyTamperProofingEnabled: false,
+    }
+  }
+  advanceConfDialogVisiable.value = true
 }
 
 const apiInfoMayUpdated = () => {
