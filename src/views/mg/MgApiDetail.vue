@@ -110,7 +110,7 @@
                       </a-tooltip>
 
                       <a-tooltip placement="topLeft" arrow-point-at-center title="点击查看API的历史调用情况">
-                        <a-button type="link">历史调用</a-button>
+                        <a-button type="link" @click="showApiCallsCount(snapshot.env.id)">历史调用</a-button>
                       </a-tooltip>
 
                       <a-popconfirm :title="`确认从${snapshot.env.name}下线API吗?`" ok-text="确认" cancel-text="取消"
@@ -300,6 +300,14 @@
         </a-modal>
       </a-col>
     </a-row>
+
+    <a-row type="flex" justify="center">
+      <a-col :span="24">
+        <a-modal width="80%" title="API调用统计" :footer="null" v-model:open="apiCallsCountDialogVisiable">
+          <api-calls-count :env-id="envIdForShowApiCallsCount" :api-id="apiId" :key="envIdForShowApiCallsCount + apiId" />
+        </a-modal>
+      </a-col>
+    </a-row>
   </a-layout>
 </template>
 
@@ -312,6 +320,7 @@ import { newInstance, StraightConnector, BlankEndpoint } from "@jsplumb/browser-
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { notification } from "ant-design-vue"
 import { useRouter } from "vue-router"
+import ApiCallsCount from '@/components/api/ApiCallsCount.vue'
 
 const router = useRouter()
 
@@ -450,6 +459,14 @@ const editApi = (apiId) => {
     name: RouteNames.mgApiUpdate,
     params: { apiId: apiId }
   })
+}
+
+const apiCallsCountDialogVisiable = ref(false)
+const envIdForShowApiCallsCount = ref("")
+const showApiCallsCount = (envId) => {
+  console.log("show api calls count in env", envId)
+  envIdForShowApiCallsCount.value = envId
+  apiCallsCountDialogVisiable.value = true
 }
 
 </script>
