@@ -10,6 +10,7 @@ const RoutePaths = {
     mgApiUpdate: "/mg/api/update/:apiId",
     mgApiDetail: "/mg/api/detail/:apiId",
     mgAccessLog: "/mg/access-log",
+    mgMonitor: "/mg/monitor",
     mgApiSubscription: "/mg/api-subscription",
     mgMyInfo: "/mg/my-info",
     mgPlugin: "/mg/plugin",

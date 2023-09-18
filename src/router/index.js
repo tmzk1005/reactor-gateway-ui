@@ -50,6 +50,10 @@ const apiManagementRoutes = {
       component: () => import("@/views/common/AccessLog.vue")
     },
     {
+      path: RoutePaths.mgMonitor,
+      component: () => import("@/views/mg/MonitorAndAlarm.vue")
+    },
+    {
       path: RoutePaths.mgApiSubscription,
       component: () => import("@/views/mg/ApiSubscription.vue")
     },

@@ -32,6 +32,11 @@
       <span>访问日志</span>
     </a-menu-item>
 
+    <a-menu-item key="monitor" @click="goToPage(RoutePaths.mgMonitor)">
+      <snippets-outlined />
+      <span>监控告警</span>
+    </a-menu-item>
+
     <a-menu-item key="environment" @click="goToPage(RoutePaths.mgEnvironment)">
       <environment-outlined />
       <span>环境</span>
