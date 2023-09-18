@@ -16,6 +16,8 @@ const RoutePaths = {
 
     mgGateway: "/mg/gateway",
 
+    mgOperations: "/mg/operations",
+
     mkIndex: "/mk",
     mkApi: "/mk/api",
     mkUserApp: "/mk/app",

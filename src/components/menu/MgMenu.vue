@@ -58,6 +58,11 @@
       <span>组织管理</span>
     </a-menu-item>
 
+    <a-menu-item key="operations" v-if="sessionStore.isSystemAdmin" @click="goToPage(RoutePaths.mgOperations)">
+      <audit-outlined />
+      <span>操作审计</span>
+    </a-menu-item>
+
     <a-menu-item key="gatewayNode" v-if="sessionStore.isSystemAdmin" @click="goToPage(RoutePaths.mgGateway)">
       <cluster-outlined />
       <span>网关节点</span>
@@ -68,7 +73,7 @@
 
 <script setup>
 import {
-  ApiOutlined, AreaChartOutlined, DeliveredProcedureOutlined, TeamOutlined, GroupOutlined,
+  ApiOutlined, AreaChartOutlined, DeliveredProcedureOutlined, TeamOutlined, GroupOutlined, AuditOutlined,
   SnippetsOutlined, UserOutlined, UsbOutlined, EnvironmentOutlined, ClusterOutlined, PlusCircleOutlined
 } from '@ant-design/icons-vue'
 
