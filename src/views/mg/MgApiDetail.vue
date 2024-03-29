@@ -11,7 +11,7 @@
           </template>
 
           <template #extra>
-            <a-button type="primary" @click="editApi(api.id)">修改</a-button>
+            <a-button type="primary" @click="editApi(api.id)" v-if="sessionStore.isNormalUser">修改</a-button>
           </template>
 
           <a-descriptions bordered :column="2" :label-style="labelStyle">
@@ -113,7 +113,8 @@
                         <a-button type="link" @click="showApiCallsCount(snapshot.env.id)">历史调用</a-button>
                       </a-tooltip>
 
-                      <a-popconfirm :title="`确认从${snapshot.env.name}下线API吗?`" ok-text="确认" cancel-text="取消"
+                      <span v-if="sessionStore.isNormalUser">
+                        <a-popconfirm :title="`确认从${snapshot.env.name}下线API吗?`" ok-text="确认" cancel-text="取消"
                         v-if="snapshot.publishStatus != 'UNPUBLISHED'" @confirm="unpublishApi(api.id, snapshot.env.id)">
                         <a-button type="primary" danger :icon="h(DownloadOutlined)">{{ `下线[${snapshot.env.name}]`
                         }}</a-button>
@@ -128,6 +129,7 @@
                         v-if="snapshot.publishStatus == 'NOT_UPDATED'" @confirm="publishApi(api.id, snapshot.env.id)">
                         <a-button type="primary" :icon="h(UploadOutlined)">{{ `更新[${snapshot.env.name}]` }}</a-button>
                       </a-popconfirm>
+                      </span>
 
                     </template>
 
@@ -312,16 +314,18 @@
 </template>
 
 <script setup>
-import { nextTick, ref, h, reactive } from 'vue'
-import { RouteNames, RoutePaths } from '@/utils/pathConstants'
-import { ApiService } from "@/services/apiService"
-import { colorForHttpMethod } from "@/utils/bizConstants"
-import { newInstance, StraightConnector, BlankEndpoint } from "@jsplumb/browser-ui"
-import { DownloadOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { notification } from "ant-design-vue"
-import { useRouter } from "vue-router"
 import ApiCallsCount from '@/components/api/ApiCallsCount.vue'
+import { ApiService } from "@/services/apiService"
+import { useSessionStore } from "@/stores/session"
+import { colorForHttpMethod } from "@/utils/bizConstants"
+import { RouteNames, RoutePaths } from '@/utils/pathConstants'
+import { DownloadOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { BlankEndpoint, StraightConnector, newInstance } from "@jsplumb/browser-ui"
+import { notification } from "ant-design-vue"
+import { h, nextTick, reactive, ref } from 'vue'
+import { useRouter } from "vue-router"
 
+const sessionStore = useSessionStore()
 const router = useRouter()
 
 const props = defineProps({
